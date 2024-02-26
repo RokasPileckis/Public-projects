@@ -1,3 +1,9 @@
+/*
+solves any sudoku puzzle.
+two ways to input puzzle: 
+1 edit the sudokugrid[][] array and disable readsudoku(sudokugrid);
+2 run readsudoku(sudokugrid) function;
+*/
 #include <iostream>
 
 using namespace std;
