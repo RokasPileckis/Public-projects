@@ -1,0 +1,416 @@
+//c++
+#include <iostream>
+
+using namespace std;
+
+//working functions
+void findposiblenumbers(int sudokugrid[9][9], int possiblenumbers[81][10], int & nullamount, int & possiblenumbersamount);
+void checkcell(int sudokugrid[9][9], int possiblenumbers[81][10], int x, int y);
+void resetpossiblenumbers(int possiblenumbers[81][10]);
+void fillgrid(int sudokugrid[9][9], int possiblenumbers[81][10], bool & done);
+void checkpossiblenumbers(int possiblenumbers[81][10], int x, int y);
+void savegrid(int sudokustack[15][85], int sudokugrid[9][9], int & stacknr);
+void initializestack(int sudokustack[15][85]);
+void findsplitlocation(int possiblenumbers[81][10], int & location, int & selectednumber);
+void gridfillfromstack(int sudokugrid[9][9], int sudokustack[15][85], int stacknr);
+int nextpossiblenumber(int possiblenumbers[81][10], int location, int & selectednumber);
+bool checksudoku(int sudokugrid[9][9]);
+void readsudoku(int sudokugrid[9][9]);
+
+//debug functions
+void printsudoku(int sudokugrid[9][9]);
+void printpossiblenumbers(int possiblenumbers[81][10]);
+void printcell(int possiblenumbers[81][10], int x, int y);
+void printstack(int sudokustack[10][85]);
+
+int main()
+{
+    
+    
+    int sudokugrid[9][9] = {
+        {7, 0, 1, 5, 9, 0, 4, 0, 0},
+        {0, 0, 0, 0, 0, 7, 0, 0, 0},
+        {6, 0, 0, 0, 0, 0, 0, 0, 3},
+        {0, 9, 0, 0, 0, 0, 0, 4, 0},
+        {0, 0, 5, 2, 1, 0, 9, 0, 0},
+        {0, 0, 0, 0, 8, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 8, 2, 0, 0},
+        {1, 0, 0, 7, 2, 0, 0, 6, 0},
+        {0, 0, 7, 0, 0, 4, 0, 0, 0},
+    };
+    
+    readsudoku(sudokugrid);
+    
+    int n = 1000;//maximalus ciklu skaicius
+    bool done;
+    int nullamount;
+    int possiblenumbersamount;
+    int location;
+    int selectednumber;
+    int stacknr;
+    int maxstack;
+    
+    int possiblenumbers[81][10];//81 cell, 9 posible numbers, 1 space for number of numbers
+    int sudokustack[15][85]; //stack for saving intermediates states, 10 sapces. 0 - if ocupied, 1 selected place, 3 - picked number, 4-85 - sudoku grid
+    initializestack(sudokustack);
+    
+    printsudoku(sudokugrid);
+    cout << endl;
+    
+    int i;
+    for(i = 0 ; i < n ; i++)
+    {
+        findposiblenumbers(sudokugrid, possiblenumbers, nullamount, possiblenumbersamount);
+        fillgrid(sudokugrid, possiblenumbers, done);
+        if(!checksudoku(sudokugrid)) goto jump1;
+        
+        if(done && nullamount != 0)
+        {
+            savegrid(sudokustack, sudokugrid, stacknr);
+            findsplitlocation(possiblenumbers, location, selectednumber);
+            sudokustack[stacknr][1] = location;
+            sudokustack[stacknr][3] = selectednumber;
+            sudokugrid[location/9][location%9] = selectednumber;
+            done = false;
+        }
+        if(stacknr > 14)
+        {
+            cout << "stack full";
+            break;
+        }
+        if(nullamount != possiblenumbersamount)
+        {
+            int temp;
+            jump1:
+            gridfillfromstack(sudokugrid, sudokustack, stacknr);
+            findposiblenumbers(sudokugrid, possiblenumbers, nullamount, possiblenumbersamount);
+            location = sudokustack[stacknr][1];
+            selectednumber = sudokustack[stacknr][3];
+            possiblenumbers[location][selectednumber] = 0;
+            temp = nextpossiblenumber(possiblenumbers, location, selectednumber);
+            
+            if(temp != 0)
+            {
+                sudokugrid[location/9][location%9] = temp;
+                sudokustack[stacknr][3] = temp;
+            }
+            else
+            {
+                sudokustack[stacknr][0] = 0;
+                stacknr--;
+                location = sudokustack[stacknr][1];
+                selectednumber = sudokustack[stacknr][3];
+                goto jump1;
+            }
+        }
+        if(done || nullamount == 0)break;
+        if(stacknr > maxstack)maxstack = stacknr;
+        if(i == n-1)
+        {
+            cout << "ciklu limitas pasiektas";
+            return 0;
+        }
+    }
+    cout << "ciklu skaicius: " << i << endl;
+    cout << "max stack size: " << maxstack << endl << endl;
+    printsudoku(sudokugrid);
+    return 0;
+}
+//1 skaiciu masyvas[9][9]
+//2 rasti kiekvienam langeliui visus galimus skaicius
+//3 jei kazkuriam yra tik 1 pasirinkimas, irasyti, gryzti i 2 zingsni
+//4 jei nera tik 1 pasirinkimo, issaugoti dabartini state
+//4.1 gal iš galimu pasirinkmu yra 1 kuris kitur netinka, tą irasyti, gryžti i 2 // dar nepadaryta
+//5 paimti kazkuri langeli su 2 pasirinkimais, ir issirinkti 1
+//6 toliau spresti, jei issisprende - ok. jei ne gryzti i 5 ir paimti kita pasrinkima
+//7 5 gali tekti pakartoti keleta kartu, nusistatyti kiek kopiju praeitu state saugau
+
+void findposiblenumbers(int sudokugrid[9][9], int possiblenumbers[81][10], int & nullamount, int & possiblenumbersamount)
+{
+    resetpossiblenumbers(possiblenumbers);
+    possiblenumbersamount = 0;
+    int x, y;
+    nullamount = 0;
+    for(int i = 0 ; i < 81 ; i++)
+    {
+        y = i / 9;
+        x = i % 9;
+        if(sudokugrid[y][x] == 0)
+        {
+            checkcell(sudokugrid, possiblenumbers, x, y);
+            //checkpossiblenumbers(possiblenumbers, x, y);
+            
+            if(possiblenumbers[i][0] > 0)possiblenumbersamount++;
+            nullamount++;
+        }
+    }
+}
+void checkcell(int sudokugrid[9][9], int possiblenumbers[81][10], int x, int y)//checks one cell for all posible numbers
+{
+    //check vertical
+    //check horizontal
+    //check 3x3
+    //pick 1 number, check, if ok, put into array
+    bool sutampa;
+    for(int i = 1 ; i < 10 ; i++)//checks number
+    {
+        sutampa = false;
+        for(int o = 0 ; o < 9 ; o++)//checks position
+        {
+            if(i == sudokugrid[o][x]) sutampa = true;
+            if(i == sudokugrid[y][o]) sutampa = true;
+            if(i == sudokugrid[(o/3)+((y/3)*3)][(o%3)+((x/3)*3)]) sutampa = true;
+        }
+        
+        if(!sutampa) 
+        {
+            possiblenumbers[y*9+x][i] = i;
+            possiblenumbers[y*9+x][0]++;
+        }
+    }
+}
+void resetpossiblenumbers(int possiblenumbers[81][10])
+{
+    for(int i = 0 ; i < 81 ; i++)
+    for(int o = 0 ; o < 10 ; o++)
+    possiblenumbers[i][o] = 0;
+}
+void printsudoku(int sudokugrid[9][9])
+{
+    for(int i = 0 ; i < 9 ; i++)
+    {
+        for(int o = 0 ; o < 9 ; o++)
+        {
+            cout << sudokugrid[i][o] << " ";
+        }
+        cout << endl;
+    }
+}
+void printpossiblenumbers(int possiblenumbers[81][10])
+{
+    cout << "possible numbers" << endl;
+    for(int i = 0 ; i < 9 ; i++)
+    {
+        for(int o = 0 ; o < 9 ; o++)
+        {
+            cout << possiblenumbers[i*9+o][1] << possiblenumbers[i*9+o][2] << possiblenumbers[i*9+o][3] << " ";
+        }
+        cout << endl;
+        for(int o = 0 ; o < 9 ; o++)
+        {
+            cout << possiblenumbers[i*9+o][4] << possiblenumbers[i*9+o][5] << possiblenumbers[i*9+o][6] << " ";
+        }
+        cout << endl;
+        for(int o = 0 ; o < 9 ; o++)
+        {
+            cout << possiblenumbers[i*9+o][7] << possiblenumbers[i*9+o][8] << possiblenumbers[i*9+o][9] << " ";
+        }
+        cout << endl << endl;
+    }
+    cout << "end of possible numbers" << endl;
+}
+void printcell(int possiblenumbers[81][10], int x, int y)
+{
+    for(int i = 0 ; i < 10 ; i++)
+    {
+        cout << possiblenumbers[y*9+x][i] << " ";
+    }
+}
+void fillgrid(int sudokugrid[9][9], int possiblenumbers[81][10], bool & done)//iraso, jei yra tik 1 pasirinkimas
+{
+    done = true;
+    for(int i = 0 ; i < 81 ; i++)
+    {
+        if(possiblenumbers[i][0] == 1)
+        {
+            for(int o = 1 ; o < 10 ; o++)
+            {
+                if(possiblenumbers[i][o] != 0)
+                {
+                    sudokugrid[i/9][i%9] = possiblenumbers[i][o];
+                    done = false;
+                    break;
+                }
+                
+            }
+        }
+    }
+}
+
+//funkcija, kuri suranda is galimu pasirinkimu 1, kuris kitur netinka
+//patikrinti stulpeli, eilute ir kvadrata, tusciu langeliu galimus skaicius
+//jei kazkuris netinka niekur kitur, tada irasyti
+//panasi i checkcell(), tik tikrini ne visus skaicius, o galimus skaicius is possiblenumbers[][], ir lygini su skaiciais is possiblenumbers[][]
+
+void checkpossiblenumbers(int possiblenumbers[81][10], int x, int y)
+{
+    bool sutampa;
+    for(int i = 1 ; i < 10 ; i++)//skaiciai
+    {
+        sutampa = false;
+        for(int o = 0 ; o < 9 ; o++)//pozicija
+        {
+            if(i-1 != o)
+            {
+                if(possiblenumbers[y*9+x][i] == possiblenumbers[y*9+o][i])sutampa = true; //patikrina eilute
+                if(possiblenumbers[y*9+x][i] == possiblenumbers[o*9+x][i])sutampa = true; //patikrina stulpeli
+                if(possiblenumbers[y*9+x][i] == possiblenumbers[(o/3)+((y/3)*3)+(o%3)+((x/3)*3)][i]) sutampa = true;
+            }
+        }
+        if(!sutampa)
+        {
+            for(int o = 1 ; o < 10 ; o++)
+            {
+                possiblenumbers[y*9+x][o] = 0;
+            }
+            possiblenumbers[y*9+x][i] = i;
+            possiblenumbers[y*9+x][0] = 1;
+            return;
+        }
+    }
+}
+void savegrid(int sudokustack[15][85], int sudokugrid[9][9], int & stacknr)
+{
+    for(int o = 0 ; o < 15 ; o++)
+    {
+        if(sudokustack[o][0] == 0)
+        {
+            stacknr = o;
+            break;
+        }
+    }
+    for(int i = 4 ; i < 85 ; i++)
+    {
+        sudokustack[stacknr][i] = sudokugrid[(i-4)/9][(i-4)%9];
+    }
+    sudokustack[stacknr][0] = 1;
+}
+void printstack(int sudokustack[15][85])
+{
+    cout << "start of stack" << endl;
+    int i = 0;
+    while(sudokustack[i][0] != 0)
+    {
+        cout << "stack nr: " << i << endl;
+        cout << "location of split: " << sudokustack[i][1] << " " << sudokustack[i][1]/9 << " " << sudokustack[i][1]%9 << endl;
+        cout << "selected number: " << sudokustack[i][3] << endl;
+        for(int o = 4 ; o < 85 ; o++)
+        {
+            cout << sudokustack[i][o] << " ";
+            if((o-3) % 9 == 0)cout << endl;
+        }
+        i++;
+        cout << endl;
+    }
+    cout << "end of stack" << endl;
+}
+void initializestack(int sudokustack[15][85])
+{
+    for(int i = 0 ; i < 15 ; i++)
+        for(int o = 0 ; o < 85 ; o++)
+            sudokustack[i][o] = 0;
+}
+void findsplitlocation(int possiblenumbers[81][10], int & location, int & selectednumber)
+{
+    int minchoce = 9;
+    for(int i = 0 ; i < 81 ; i++)
+    {
+        if(possiblenumbers[i][0] > 0)
+            if(possiblenumbers[i][0] < minchoce)
+                minchoce = possiblenumbers[i][0];
+    }
+    for(int i = 0 ; i < 81 ; i++)
+    {
+        if(possiblenumbers[i][0] == minchoce)
+        {
+            location = i;
+            for(int o = 1 ; o < 10 ; o++)
+            {
+                if(possiblenumbers[i][o] != 0)
+                {
+                    selectednumber = o;
+                    return;
+                }
+            }
+        }
+    }
+}
+void gridfillfromstack(int sudokugrid[9][9], int sudokustack[15][85], int stacknr)
+{
+    for(int i = 4 ; i < 85 ; i++)
+    {
+        sudokugrid[(i-4)/9][(i-4)%9] = sudokustack[stacknr][i];
+    }
+}
+int nextpossiblenumber(int possiblenumbers[81][10], int location, int & selectednumber)
+{
+    for(int i = selectednumber+1 ; i < 10 ; i++)
+    {
+        if(possiblenumbers[location][i] != 0)
+        {
+            selectednumber = i;
+            return i;
+        }
+    }
+    return 0;
+}
+bool checksudoku(int sudokugrid[9][9])
+{
+    int temp;
+
+    for(int i = 0 ; i < 9 ; i++)//patikrina eilutes
+    {
+
+        for(int o = 1 ; o < 10 ; o++)//skaicius
+        {
+            temp = 0;
+            for(int p = 0 ; p < 9 ; p++)//pozicija
+            {
+                if(o != p)if(sudokugrid[i][p] == o)temp++;
+            }
+            if(temp > 1)return false;
+        }
+    }
+    
+    for(int i = 0 ; i < 9 ; i++)//patikrina stulpeli
+    {
+        for(int o = 1 ; o < 9 ; o++)//skaicius
+        {
+            temp = 0;
+            for(int p = 0 ; p < 9 ; p++)//pozicija
+            {
+                if(o != p)if(sudokugrid[p][i] == o)temp++;
+            }
+            if(temp > 1)return false;
+        }
+    }
+    
+    for(int i = 0 ; i < 9 ; i++)//patikrina 3x3
+    {
+        for(int o = 1 ; o < 9 ; o++)//skaicius
+        {
+            temp = 0;
+            for(int p = 0 ; p < 9 ; p++)//pozicija
+            {
+                if(o != p)if(sudokugrid[(i/3)*3+p/3][(i%3)*3+p%3] == o)temp++;
+            }
+            if(temp > 1)return false;
+        }
+    }
+    return true;
+}
+void readsudoku(int sudokugrid[9][9])
+{
+    cout << "input sudoku one line at a time" << endl;
+    long int a;
+    for(int i = 0 ; i < 9 ; i++)
+    {
+        cin >> a;
+        for(int o = 8 ; o >= 0 ; o--)
+        {
+            sudokugrid[i][o] = a%10;
+            a = a/10;
+        }
+    }
+    cout << endl;
+}
