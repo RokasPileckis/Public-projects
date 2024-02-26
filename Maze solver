@@ -1,0 +1,376 @@
+//c++
+#include <iostream>
+#include <math.h>
+
+struct node
+{
+    int ax, ay; // ankstesnis node, is kurio atejo
+    int x, y; // node kordinates
+    int atsprad; // atstumas iki pradzios
+    double atspab; // atstumas iki pabaigos, spejimas
+    double ats; // atstumas bendras
+    int x1, x2, x3, x4, y1, y2, y3, y4; // kaimyniniai nodes
+    bool ziuretas = false;
+};
+
+using namespace std;
+
+void rasknodes(int a, int b, char pix[11][11], node nodes[], int & n, char balta);
+void sujunknodes(int a, int b, char pix[11][11], node nodes[], int n, char balta);
+void astar(node nodes[], int n);
+int kurisnode(int x, int y, node nodes[], int n);
+void printnodes(node nodes[], int n);
+void printsnode(node a);
+void buublesort(node sarasas[], int sar);
+void kelias(node nodes[], int n);
+void copynode(node nodes[], node sarasas[], int a, int & sar);
+
+int main()
+{
+    char balta = 'X'; // takelio spalva
+    char pix[11][11] = {
+    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+    {'X', 'X', '0', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '0'},
+    {'0', 'X', '0', 'X', '0', 'X', '0', '0', '0', 'X', '0'},
+    {'0', 'X', 'X', 'X', '0', 'X', '0', 'X', 'X', 'X', '0'},
+    {'0', '0', '0', '0', '0', 'X', '0', '0', '0', 'X', '0'},
+    {'0', 'X', 'X', 'X', '0', 'X', 'X', 'X', '0', 'X', '0'},
+    {'0', 'X', '0', 'X', '0', '0', '0', 'X', '0', 'X', '0'},
+    {'0', 'X', '0', 'X', 'X', 'X', 'X', 'X', '0', 'X', '0'},
+    {'0', 'X', '0', '0', '0', '0', '0', '0', '0', 'X', '0'},
+    {'0', 'X', 'X', 'X', '0', 'X', 'X', 'X', 'X', 'X', 'X'},
+    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+    };
+    int a = 11, b = 11; //maze dydis, x ir y
+    int n;
+    node nodes[50];
+    
+    rasknodes(a, b, pix, nodes, n, balta);
+    //printnodes(nodes, n);
+    sujunknodes(a, b, pix, nodes, n, balta);
+    //printnodes(nodes, n);
+    astar(nodes, n);
+    //printnodes(nodes, n);
+    kelias(nodes, n);
+    
+    
+    return 0;
+}
+void rasknodes(int a, int b, char pix[11][11], node nodes[], int & n, char balta)
+{
+    // n yra node count;
+    n = 0;
+    
+    // maze pradzios node
+    nodes[0].x = 0;
+    nodes[0].y = 1;
+    nodes[0].atsprad = 0;
+    nodes[0].atspab = sqrt(pow(a-1,2) + pow((b-3),2));
+    nodes[0].ats = nodes[0].atsprad + nodes[0].atspab;
+    nodes[0].ax = -1;
+    nodes[0].ay = -1;
+    nodes[0].ziuretas = false;
+    n++;
+    
+    // node paieska
+    for(int x = 1 ; x < a-1 ; x++)
+    for(int y = 1 ; y < b-1 ; y++)
+    {
+        if(pix[y][x] == balta)
+        if((pix[y][x-1] != pix[y][x+1]) || (pix[y-1][x] != pix[y+1][x]))
+        {
+            nodes[n].x = x;
+            nodes[n].y = y;
+            nodes[n].ax = -1;
+            nodes[n].ay = -1;
+            nodes[n].atspab = sqrt(pow((a-x-1),2) + pow((b-2-y),2));
+            nodes[n].atsprad = 0;
+            nodes[n].ats = nodes[n].atsprad + nodes[n].atspab;
+            nodes[n].ziuretas = false;
+            n++;
+        }
+    }
+    // maze pabaigos node
+    nodes[n].x = a-1;
+    nodes[n].y = b-2;
+    nodes[n].ax = -1;
+    nodes[n].ay = -1;
+    nodes[n].atspab = 0;
+    nodes[n].atsprad = 0;
+    nodes[n].ats = nodes[n].atsprad + nodes[n].atspab;
+    nodes[n].ziuretas = false;
+    n++;
+    cout << "node skaicius: " << n << endl;
+    
+}
+void sujunknodes(int a, int b, char pix[11][11], node nodes[], int n, char balta)
+{
+    //pradzios node kaimynas
+    int o = 1;
+    while(pix[1][o-1] == balta)
+    {
+        if(kurisnode(o, 1, nodes, n) != 0) break;
+        o++;
+    }
+    nodes[0].x1 = 0;
+    nodes[0].y1 = 0;
+    nodes[0].x2 = o;
+    nodes[0].y2 = 1;
+    nodes[0].x3 = 0;
+    nodes[0].y3 = 0;
+    nodes[0].x4 = 0;
+    nodes[0].y4 = 0;
+    
+    //pabaigos node kaimynas
+    o = 2;
+    while(pix[b-1][a-o] == balta) 
+    {
+        if(kurisnode(a-o, b-2, nodes, n) != 0) break;
+        o++;
+    }
+    nodes[n-1].x1 = a-o;
+    nodes[n-1].y1 = b-2;
+    nodes[n-1].x2 = 0;
+    nodes[n-1].y2 = 0;
+    nodes[n-1].x3 = 0;
+    nodes[n-1].y3 = 0;
+    nodes[n-1].x4 = 0;
+    nodes[n-1].y4 = 0;
+     
+      
+    int x, y;
+    for(int i = 1 ; i < n-1 ; i++)
+    {
+        x = nodes[i].x;
+        y = nodes[i].y;
+        //cout << i << " " << x << " " << y << endl;
+        if(pix[y][x-1] == balta)//pixel kaireje yra baltas
+        {
+            int o = 1;
+            while(pix[y][x-o] == balta)
+            {
+                if(kurisnode(x-o, y, nodes, n) != 0) break;
+                o++;
+            }
+            nodes[i].x1 = x-o;
+            nodes[i].y1 = y;
+        }
+        else
+        {
+            nodes[i].x1 = 0;
+            nodes[i].y1 = 0;
+        }
+        
+        if(pix[y][x+1] == balta)//pixel desineje yra baltas
+        {
+            int o = 1;
+            while(pix[y][x+o] == balta)
+            {
+                if(kurisnode(x+o, y, nodes, n) != 0) break;
+                o++;
+            }
+            nodes[i].x2 = x+o;
+            nodes[i].y2 = y;
+        }
+        else
+        {
+            nodes[i].x2 = 0;
+            nodes[i].y2 = 0;
+        }
+        
+        if(pix[y-1][x] == balta)//pixel virsuje yra baltas
+        {
+            int o = 1;
+            while(pix[y-o][x] == balta)
+            {
+                if(kurisnode(x, y-o, nodes, n) != 0) break;
+                o++;
+            }
+            nodes[i].x3 = x;
+            nodes[i].y3 = y-o;
+        }
+        else
+        {
+            nodes[i].x3 = 0;
+            nodes[i].y3 = 0;
+        }
+        
+        if(pix[y+1][x] == balta)//pixel apacioje yra baltas
+        {
+            int o = 1;
+            while(pix[y+o][x] == balta)
+            {
+                if(kurisnode(x, y+o, nodes, n) != 0) break;
+                o++;
+            }
+            nodes[i].x4 = x;
+            nodes[i].y4 = y+o;
+        }
+        else
+        {
+            nodes[i].x4 = 0;
+            nodes[i].y4 = 0;
+        }
+    }
+    //cout << "kaimynai surasti" << endl;
+}
+void astar(node nodes[], int n)
+{
+    int a; //node nr
+    int sar = 0; // saraso ilgis
+    node sarasas[n];
+    sarasas[0] = nodes[0];
+    nodes[0].ziuretas = true;
+    sarasas[0].ats = sarasas[0].atsprad + sarasas[0].atspab;
+    
+    
+    sar++;
+    for(int i = 0 ; i < n ; i++)
+    {
+        //patikrina ar atejo iki pabaigos
+        if(sarasas[0].atspab == 0)
+        {
+            cout << "a* ciklai: " << i << endl;
+            cout << "kelias rastas" << endl;
+            a = kurisnode(sarasas[0].x, sarasas[0].y, nodes, n);
+            nodes[a].atsprad = sarasas[0].atsprad;
+            break;
+        }
+        
+        //kairys kaimynas
+        if(sarasas[0].x1 != 0)
+        {
+            a = kurisnode(sarasas[0].x1, sarasas[0].y1, nodes, n);
+            if(!nodes[a].ziuretas)
+            {
+                copynode(nodes, sarasas, a, sar);
+            }
+        }
+            
+        //desinys kaimynas
+        if(sarasas[0].x2 != 0)
+        {
+            a = kurisnode(sarasas[0].x2, sarasas[0].y2, nodes, n);
+            if(!nodes[a].ziuretas)
+            {
+                copynode(nodes, sarasas, a, sar);
+            }
+        }
+            
+        //virsutinis kaimynas
+        if(sarasas[0].x3 != 0)
+        {
+            a = kurisnode(sarasas[0].x3, sarasas[0].y3, nodes, n);
+            if(!nodes[a].ziuretas)
+            {
+                copynode(nodes, sarasas, a, sar);
+            }
+        }
+            
+        //apatinis kaimynas
+        if(sarasas[0].x4 != 0)
+        {
+            a = kurisnode(sarasas[0].x4, sarasas[0].y4, nodes, n);
+            if(!nodes[a].ziuretas)
+            {
+                copynode(nodes, sarasas, a, sar);
+            }
+        }
+            
+        sarasas[0].ats = 99999;
+        buublesort(sarasas, sar);
+        sar--;
+        
+        //jei sarasas tuscias, tai kelio nera
+        if(sar < 1)
+        {
+            cout << "a* ciklai: " << i << endl;
+            cout << "kelio nera" << endl;
+            break;
+        }
+    
+    }
+    
+    //sprendimas:
+    //jei pirmas sarase yra pabaiga - done
+    //jei ne, sudeti i sarasa pirmo kaimynus
+    //istrinti pirma
+    //surusiuoti sarasa
+    
+}
+int kurisnode(int x, int y, node nodes[], int n)
+{
+    for(int i = 0 ; i < n ; i++)
+    {
+        if(nodes[i].x == x && nodes[i].y == y)return i;
+    }
+    return 0;
+}
+void printnodes(node nodes[], int n)
+{
+    for(int i = 0 ; i < n ; i++)
+    {
+        //cout << "node nr: " << i << endl;
+        cout << "node kordinates: " << nodes[i].x << " " << nodes[i].y << endl;
+        cout << "ankstesnis node: " << nodes[i].ax << " " << nodes[i].ay << endl;
+        //cout << "kaimynas k node: " << nodes[i].x1 << " " << nodes[i].y1 << endl;
+        //cout << "kaimynas d node: " << nodes[i].x2 << " " << nodes[i].y2 << endl;
+        //cout << "kaimynas v node: " << nodes[i].x3 << " " << nodes[i].y3 << endl;
+        //cout << "kaimynas a node: " << nodes[i].x4 << " " << nodes[i].y4 << endl;
+        //cout << "atstumas iki pradzios : " << nodes[i].atsprad << endl;
+        //cout << "atstumas iki pabaigos : " << nodes[i].atspab << endl;
+        cout << "atstumas bendras: " << nodes[i].ats << endl;
+        cout << endl;
+    }
+}
+void printsnode(node a)
+{
+    cout << "node kordinates: " << a.x << " " << a.y << endl;
+    cout << "ankstesnis node: " << a.ax << " " << a.ay << endl;
+    cout << "kaimynas k node: " << a.x1 << " " << a.y1 << endl;
+    cout << "kaimynas d node: " << a.x2 << " " << a.y2 << endl;
+    cout << "kaimynas v node: " << a.x3 << " " << a.y3 << endl;
+    cout << "kaimynas a node: " << a.x4 << " " << a.y4 << endl;
+    cout << "atstumas iki pradzios : " << a.atsprad << endl;
+    cout << "atstumas iki pabaigos : " << a.atspab << endl;
+    cout << "atstumas bendras: " << a.ats << endl;
+    cout << endl;
+}
+void buublesort(node sarasas[], int sar)
+{
+    node temp;
+    for(int o = 0 ; o < sar ; o++)
+    {
+        for(int i = 1 ; i < sar-o ; i++)
+        {
+            if(sarasas[i].ats < sarasas[i-1].ats)
+            {
+                temp = sarasas[i];
+                sarasas[i] = sarasas[i-1];
+                sarasas[i-1] = temp;
+            }
+        }
+    }
+}
+void kelias(node nodes[], int n)
+{
+    int a = n-1;
+    cout << "kelio ilgis: " << nodes[n-1].atsprad << endl;
+    while(a > 0)
+    {
+        cout << "node kordinates: " << nodes[a].x << " " << nodes[a].y << endl;
+        a = kurisnode(nodes[a].ax, nodes[a].ay, nodes, n);
+    }
+    cout << "node kordinates: " << nodes[a].x << " " << nodes[a].y << endl;
+}
+void copynode(node nodes[], node sarasas[], int a, int & sar)
+{
+    nodes[a].ziuretas = true;
+    sarasas[sar] = nodes[a];
+    nodes[a].ax = sarasas[0].x;
+    nodes[a].ay = sarasas[0].y;
+
+    sarasas[sar].atsprad = sarasas[0].atsprad + abs(sarasas[sar].x - sarasas[0].x) + abs(sarasas[sar].y - sarasas[0].y);
+    sarasas[sar].ats = sarasas[sar].atsprad + sarasas[sar].atspab;
+    sar++;
+}
