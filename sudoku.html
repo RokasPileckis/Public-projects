@@ -29,10 +29,9 @@
 </form>
 
 <!-- table, input with key presed. highlight selected -->
-.t3*3 {
 <table>
   <tr>
-    <td>01</td>
+    <td id="T1">01</td>
     <td>02</td>
     <td>03</td>
   </tr>
@@ -47,31 +46,15 @@
     <td>21</td>
   </tr>
 </table>
+
+<button onclick="displayResult()">Change text</button>
+
+<script>
+function displayResult() {
+  document.getElementById("T1").innerHTML = "day!";
+}
+</script>
   
-  }
-
-
-
-  
-<table>
-  <tr>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-  </tr>
-  <tr>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-  </tr>
-  <tr>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-    <td><div class="t3*3"></td>
-  </tr>
-</table>
-
-<div class="t3*3">
   
 </body>
 </html>
