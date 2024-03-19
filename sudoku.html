@@ -47,7 +47,7 @@
 <!-- table, input with key presed. highlight selected -->
 <table>
   <tr>
-    <td id="T1">0</td>
+    <td id="T1" onclick="highlight()">0</td>
     <td id="T2">0</td>
     <td id="T3" class="col">0</td>
     <td id="T4">0</td>
@@ -147,12 +147,14 @@
   </tr>
 </table>
 
-<button onclick="displayResult()">Change text</button>
+
 
 <script>
-function displayResult() {
+
+function highlight() {
   document.getElementById("T1").innerHTML = "1";
 }
+  
 </script>
   
   
