@@ -141,8 +141,20 @@
     <td id="T81" onclick="highlight(id)">0</td>
   </tr>
 </table>
-
-
+<table>
+  <tr>
+    <td id="N0" onclick="numselect(id)">0</td>
+    <td id="N1" onclick="numselect(id)">1</td>
+    <td id="N2" onclick="numselect(id)">2</td>
+    <td id="N3" onclick="numselect(id)">3</td>
+    <td id="N4" onclick="numselect(id)">4</td>
+    <td id="N5" onclick="numselect(id)">5</td>
+    <td id="N6" onclick="numselect(id)">6</td>
+    <td id="N7" onclick="numselect(id)">7</td>
+    <td id="N8" onclick="numselect(id)">8</td>
+    <td id="N9" onclick="numselect(id)">9</td>
+  </tr>
+</table>
 
 <script>
 let oldtr = "T1";
@@ -155,6 +167,12 @@ function highlight(thisid) {
   document.getElementById(oldtr).style.backgroundColor = "#D3D3D3";
   oldtr = newtr;
 }
+
+function numselect(thisid)
+{
+  document.getElementById(newtr).innerHTML = document.getElementById(thisid).value;
+}
+  
   
 </script>
   
