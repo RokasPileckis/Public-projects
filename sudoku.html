@@ -141,6 +141,7 @@
     <td id="T81" onclick="highlight(id)">0</td>
   </tr>
 </table>
+<br>
 <table>
   <tr>
     <td id="N0" onclick="numselect(id)">0</td>
@@ -164,7 +165,11 @@ let newtr = "T1";;
 function highlight(thisid) {
   newtr = thisid;
   document.getElementById(newtr).style.backgroundColor = "#ff4d4d";
-  document.getElementById(oldtr).style.backgroundColor = "#D3D3D3";
+  if(document.getElementById(oldtr).innerHTML == 0)
+  {
+    document.getElementById(oldtr).style.backgroundColor = "#D3D3D3";
+  }
+  
   oldtr = newtr;
 }
 
