@@ -55,10 +55,12 @@ function numselect(thisid)
   document.getElementById(newtr).innerHTML = document.getElementById(thisid).innerHTML;
   document.getElementById(newtr).style.backgroundColor = "#b3b3b3";
 }
-  
-function keyinput(event) {
+
+function keyinput(event) 
+{
   let key = event.key;
   switch(key)
+  {
     case "0":
       document.getElementById(newtr).innerHTML = 0;
     case "1":
@@ -79,7 +81,9 @@ function keyinput(event) {
       document.getElementById(newtr).innerHTML = 8;
     case "9":
       document.getElementById(newtr).innerHTML = 9;
+  }
 }
+
 <!-- src="sudokuscript.js" -->
 </script>
 <!-- <script src="sudokuscript.js"></script> -->
