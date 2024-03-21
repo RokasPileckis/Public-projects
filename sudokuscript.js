@@ -32,25 +32,25 @@ function keypresed(key) {
   console.log(key);
   switch(key)
   {
-    case "0":
+    case 48:
       document.getElementById(newtr).innerHTML = 0;
-    case "1":
+    case 49:
       document.getElementById(newtr).innerHTML = 1;
-    case "2":
+    case 50:
       document.getElementById(newtr).innerHTML = 2;
-    case "3":
+    case 51:
       document.getElementById(newtr).innerHTML = 3;
-    case "4":
+    case 52:
       document.getElementById(newtr).innerHTML = 4;
-    case "5":
+    case 53:
       document.getElementById(newtr).innerHTML = 5;
-    case "6":
+    case 54:
       document.getElementById(newtr).innerHTML = 6;
-    case "7":
+    case 55:
       document.getElementById(newtr).innerHTML = 7;
-    case "8":
+    case 56:
       document.getElementById(newtr).innerHTML = 8;
-    case "9":
+    case 57:
       document.getElementById(newtr).innerHTML = 9;
   }
 }
