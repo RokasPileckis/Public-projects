@@ -1,12 +1,18 @@
 const sudokugrid = [];
 
+function solve()
+{
+  readsudoku();
+  printsudoku();
+}
+
+
 function readsudoku()
 {
   for(let i = 0 ; i < 81 ; i++)
   {
     sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
   }
-  printsudoku();
 }
 function printsudoku()
 {
@@ -15,3 +21,7 @@ function printsudoku()
     console.log(sudokugrid[i]); 
   }
 }
+
+
+
+
