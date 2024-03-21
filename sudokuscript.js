@@ -65,7 +65,7 @@ function keypresed(key) {
     case 105:
       document.getElementById(newtr).innerHTML = 9;
       break;
-      /*
+      
     case 37:
       highlightid -= 1;
       if(highlightid == 0)highlightid = 81;
@@ -86,7 +86,7 @@ function keypresed(key) {
       if(highlightid < 1)highlightid +=72;
       highlight("T"+highlightid);
       break;
-      */
+      
   }
 }
 
