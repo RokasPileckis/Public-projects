@@ -72,8 +72,8 @@ function keypresed(key) {
       highlight("T"+highlightid);
       break;
     case 38:
-      highlightid += 9;
-      if(highlightid > 81)highlightid -=72;
+      highlightid -= 9;
+      if(highlightid < 1)highlightid +=81;
       highlight("T"+highlightid);
       break;
     case 39:
@@ -82,16 +82,11 @@ function keypresed(key) {
       highlight("T"+highlightid);
       break;
     case 40:
-      highlightid -= 9;
-      if(highlightid < 1)highlightid +=72;
+      highlightid += 9;
+      if(highlightid > 81)highlightid -=81;
       highlight("T"+highlightid);
       break;
       
   }
 }
-
-
-
-
-
 
