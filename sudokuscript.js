@@ -3,6 +3,7 @@ let newtr = "T1";;
 
   
 function highlight(thisid) {
+  console.log(thisid);
   newtr = thisid;
   document.getElementById(newtr).style.backgroundColor = "#93D393";
   if(newtr != oldtr)
