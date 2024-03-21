@@ -23,6 +23,7 @@ function numselect(thisid)
 }
 function keyinput(event) {
   let key = event.key;
+  console.log("key presed");
   switch(key)
   {
     case "0":
