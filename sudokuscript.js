@@ -24,6 +24,7 @@ function numselect(thisid)
 function keyinput(event) {
   let key = event.key;
   switch(key)
+  {
     case "0":
       document.getElementById(newtr).innerHTML = 0;
     case "1":
@@ -44,6 +45,7 @@ function keyinput(event) {
       document.getElementById(newtr).innerHTML = 8;
     case "9":
       document.getElementById(newtr).innerHTML = 9;
+  }
 }
 
 
