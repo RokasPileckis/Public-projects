@@ -1,5 +1,6 @@
 let oldtr = "T1";
 let newtr = "T1";;
+let highlightid = 0;
 
   
 function highlight(thisid) {
@@ -62,6 +63,18 @@ function keypresed(key) {
       break;
     case 105:
       document.getElementById(newtr).innerHTML = 9;
+      break;
+    case 37:
+      highlightid -= 1;
+      break;
+    case 38:
+      highlightid += 9;
+      break;
+    case 39:
+      highlightid += 1;
+      break;
+    case 40:
+      highlightid -= 9;
       break;
   }
 }
