@@ -35,24 +35,34 @@ function keypresed(key) {
   {
     case 96:
       document.getElementById(newtr).innerHTML = 0;
+      break;
     case 97:
       document.getElementById(newtr).innerHTML = 1;
+      break;
     case 98:
       document.getElementById(newtr).innerHTML = 2;
+      break;
     case 99:
       document.getElementById(newtr).innerHTML = 3;
+      break;
     case 100:
       document.getElementById(newtr).innerHTML = 4;
+      break;
     case 101:
       document.getElementById(newtr).innerHTML = 5;
+      break;
     case 102:
       document.getElementById(newtr).innerHTML = 6;
+      break;
     case 103:
       document.getElementById(newtr).innerHTML = 7;
+      break;
     case 104:
       document.getElementById(newtr).innerHTML = 8;
+      break;
     case 105:
       document.getElementById(newtr).innerHTML = 9;
+      break;
   }
 }
 
