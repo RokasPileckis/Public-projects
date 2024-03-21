@@ -4,6 +4,7 @@ let highlightid = 0;
 
   
 function highlight(thisid) {
+  
   console.log(thisid);
   newtr = thisid;
   document.getElementById(newtr).style.backgroundColor = "#93D393";
@@ -66,23 +67,23 @@ function keypresed(key) {
       break;
     case 37:
       highlightid -= 1;
-      if(hihighlightid == 0)highlightid = 81;
-      highlight("T"+hihighlightid);
+      if(highlightid == 0)highlightid = 81;
+      highlight("T"+highlightid);
       break;
     case 38:
       highlightid += 9;
-      if(hihighlightid > 81)highlightid -=72;
-      highlight("T"+hihighlightid);
+      if(highlightid > 81)highlightid -=72;
+      highlight("T"+highlightid);
       break;
     case 39:
       highlightid += 1;
-      if(hihighlightid == 82)highlightid = 1;
-      highlight("T"+hihighlightid);
+      if(highlightid == 82)highlightid = 1;
+      highlight("T"+highlightid);
       break;
     case 40:
       highlightid -= 9;
-      if(hihighlightid < 1)highlightid +=72;
-      highlight("T"+hihighlightid);
+      if(highlightid < 1)highlightid +=72;
+      highlight("T"+highlightid);
       break;
   }
 }
