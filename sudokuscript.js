@@ -4,7 +4,7 @@ let highlightid = 0;
 
   
 function highlight(thisid) {
-  
+  highlightid = Number(thisid.slice(1));
   console.log(thisid);
   newtr = thisid;
   document.getElementById(newtr).style.backgroundColor = "#93D393";
