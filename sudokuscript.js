@@ -21,9 +21,15 @@ function numselect(thisid)
   document.getElementById(newtr).innerHTML = document.getElementById(thisid).innerHTML;
   document.getElementById(newtr).style.backgroundColor = "#b3b3b3";
 }
-function keyinput(event) {
-  let key = event.key;
-  console.log("key presed");
+
+document.addEventListener("keydown", function onPress(event) 
+{
+  keypresed(event.keyCode || event.which)
+});
+
+
+function keypresed(key) {
+  console.log(key);
   switch(key)
   {
     case "0":
