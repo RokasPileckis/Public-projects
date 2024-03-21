@@ -66,15 +66,23 @@ function keypresed(key) {
       break;
     case 37:
       highlightid -= 1;
+      if(hihighlightid == 0)highlightid = 81;
+      highlight("T"+hihighlightid);
       break;
     case 38:
       highlightid += 9;
+      if(hihighlightid > 81)highlightid = -=72;
+      highlight("T"+hihighlightid);
       break;
     case 39:
       highlightid += 1;
+      if(hihighlightid == 82)highlightid = 1;
+      highlight("T"+hihighlightid);
       break;
     case 40:
       highlightid -= 9;
+      if(hihighlightid < 1)highlightid = +=72;
+      highlight("T"+hihighlightid);
       break;
   }
 }
