@@ -11,6 +11,7 @@ function solve()
   initializearrays()
   readsudoku();
   printsudoku();
+  findposiblenumbers();
 }
 
 
@@ -38,6 +39,9 @@ function printsudoku()
 }
 function initializearrays()
 {
+  <!--
+  creates possiblenumbers and sudokustack arrays
+  -->
   for(let i = 0 ; i < 81 ; i++)
   {
     possiblenumbers[i] = [];
@@ -58,6 +62,11 @@ function initializearrays()
 }
 function findposiblenumbers()
 {
+  <!--
+  checks all cells that have value==0 and finds all possible numbers that can be placed there
+  counts cells with value==0
+  counts cells with value==0 and have possible numbers
+  -->
   resetpossiblenumbers();
   possiblenumbersamount = 0;
   for(let i = 0 ; i < 81 ; i++)
@@ -78,20 +87,32 @@ function resetpossiblenumbers()
 }
 function checkcell(pos)
 {
+  <!--
+  checks one place for all possible numbers that can be put there
+  i = number that is being cheked
+  o = position in row, collum and 3x3 grid
+  if a number isnt found in row, collum and 3x3 grid
+  then it is valid number and is placed in possiblenumbers array
+  -->
   let row, col, row3x3, col3x3;
   let match = false;
-  for(let i = 1 ; i < 10 ; i++)//Number
+  for(let i = 1 ; i < 10 ; i++)
   {
     row = Math.floor(pos/9);
     row3x3 = Math.floor(row/3);
     col = pos % 9;
-    col3x3 = col % 3;
+    col3x3 = Math.floor(col/3);
     match = false;
-    for(let o = 0 ; o < 9 ; o++)//position
+    for(let o = 0 ; o < 9 ; o++)
     {
       if(i == sudokugridnew[row*9+o])match = true;
       if(i == sudokugridnew[o*9+col])match = true;
-      
+      if(i == sudokugridnew[row3x3*27 + Math.floor(o/3)*9 + col3x3*3 + o%3])match = true;
+    }
+    if(!match) 
+    {
+      possiblenumbers[pos][i] = i;
+      possiblenumbers[pos][0]++;
     }
   }
 }
