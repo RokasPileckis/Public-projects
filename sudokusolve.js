@@ -11,7 +11,7 @@ function solve()
   initializearrays()
   readsudoku();
   printsudoku();
-  findposiblenumbers();
+  findpossiblenumbers();
 }
 
 
@@ -60,7 +60,7 @@ function initializearrays()
   }
   
 }
-function findposiblenumbers()
+function findpossiblenumbers()
 {
   <!--
   checks all cells that have value==0 and finds all possible numbers that can be placed there
@@ -69,6 +69,7 @@ function findposiblenumbers()
   -->
   resetpossiblenumbers();
   possiblenumbersamount = 0;
+  nullamount = 0;
   for(let i = 0 ; i < 81 ; i++)
   {
     if(sudokugridnew[i] == 0)
