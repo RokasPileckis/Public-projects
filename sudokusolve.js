@@ -24,9 +24,9 @@ function solve()
     console.log("i: " + i);
     findpossiblenumbers();
     fillgrid();
-    console.log("possiblenumbersamount: " + possiblenumbersamount);
-    console.log("nullamount: " + nullamount);
-    console.log("done: " + done);
+    //console.log("possiblenumbersamount: " + possiblenumbersamount);
+    //console.log("nullamount: " + nullamount);
+    //console.log("done: " + done);
     console.log("stacknr: " + stacknr);
     if(!checksudoku)
     {
@@ -74,7 +74,8 @@ function printsudoku()
     if((i+1) % 9 == 0)
     {
       o++;
-      document.getElementById("output" + o).innerHTML = str;
+      //document.getElementById("output" + o).innerHTML = str;
+      console.log(str);
       str = "";
     }
   }
@@ -233,13 +234,21 @@ function savetostack()
 }
 function loadfromstack()
 {
-  let quessnumber;
+  printsudoku();
+  console.log("loadfromstack")
+  let location, selectednumber, quessnumber;
   readstack();
+  console.log("read stack");
+  printsudoku();
   findpossiblenumbers();
   location = sudokustack[stacknr][1];
   selectednumber = sudokustack[stacknr][2];
   possiblenumbers[location][selectednumber] = 0;
-  quessnumber = nextpossiblenumber();
+  quessnumber = nextpossiblenumber(location, selectednumber);
+  console.log("location " + location);
+  console.log("selectednumber " + selectednumber);
+  console.log("possiblenumbersamount: " + possiblenumbersamount);
+  console.log("nullamount: " + nullamount);
   if(quessnumber != 0)
   {
     sudokugridnew[location] = quessnumber;
@@ -263,17 +272,13 @@ function readstack()
 {
   for(let i = 3 ; i < 84 ; i++)
   {
-    sudokugridnew[i-3] = sudokustack[stacknr][i];
+    sudokugridnew[i-3] = sudokustack[stacknr-1][i];
   }
 }
 function writestack()
 {
   for(let i = 3 ; i < 84 ; i++)
   {
-    //console.log(stacknr);
-    //console.log(i);
-    //console.log(sudokustack[stacknr][i]);
-    //console.log(sudokugridnew[i-3]);
     sudokustack[stacknr][i] = sudokugridnew[i-3];
   }
   sudokustack[stacknr][0] = 1;
@@ -307,13 +312,12 @@ function findsplitlocation(output)
     }
   }
 }
-function nextpossiblenumber()
+function nextpossiblenumber(location, selectednumber)
 {
   for(let i = selectednumber+1 ; i < 10 ; i++)
   {
     if(possiblenumbers[location][i] != 0)
     {
-      selectednumber = i;
       return i;
     }
   }
