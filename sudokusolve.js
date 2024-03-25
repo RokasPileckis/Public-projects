@@ -8,9 +8,11 @@ let nullamount = 0;
 let possiblenumbersamount = 0;
 let done = false;
 let stacknr = 0;
+let maxstack = 30;
 
 function solve()
 {
+  reset();
   initializearrays()
   readsudoku();
   printsudoku();
@@ -25,6 +27,7 @@ function solve()
     console.log("possiblenumbersamount: " + possiblenumbersamount);
     console.log("nullamount: " + nullamount);
     console.log("done: " + done);
+    console.log("stacknr: " + stacknr);
     if(!checksudoku)
     {
       if(i == 0)console.log("sudoku invalid");
@@ -41,6 +44,11 @@ function solve()
     {
       console.log("ciklu limitas pasiektas");
       return 0;
+    }
+    if(stacknr == maxstack-1)
+    {
+      console.log("stack limit reached");
+      break;
     }
   }
   console.log("ciklu skaicius: " + i);
@@ -84,7 +92,7 @@ function initializearrays()
       possiblenumbers[i][o] = 0;
     }
   }
-  for(let i = 0 ; i < 15 ; i++)
+  for(let i = 0 ; i < maxstack ; i++)
   {
     sudokustack[i] = [];
     for(let o = 0 ; o < 84 ; o++)
@@ -311,5 +319,11 @@ function nextpossiblenumber()
   }
   return 0;
 }
-
+function reset()
+{
+  nullamount = 0;
+  possiblenumbersamount = 0;
+  done = false;
+  stacknr = 0;
+}
 
