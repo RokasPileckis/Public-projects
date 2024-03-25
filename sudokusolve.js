@@ -8,7 +8,7 @@ let nullamount = 0;
 let possiblenumbersamount = 0;
 let done = false;
 let stacknr = 0;
-let maxstack = 30;
+let maxstack = 50;
 
 function solve()
 {
