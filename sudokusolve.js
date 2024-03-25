@@ -31,12 +31,13 @@ function solve()
       console.log("solution found");
       break;
     }
-    if(i == n-1)
+    if(i == 1000)
     {
       console.log("ciklu limitas pasiektas");
       return 0;
     }
   }
+  printsudoku();
 }
 
 
@@ -53,7 +54,7 @@ function printsudoku()
   let o = 0;
   for(let i = 0 ; i < 81 ; i++)
   {
-    str += sudokugrid[i] + " ";
+    str += sudokugridnew[i] + " ";
     if((i+1) % 9 == 0)
     {
       o++;
@@ -64,9 +65,11 @@ function printsudoku()
 }
 function initializearrays()
 {
+  /*
   <!--
   creates possiblenumbers and sudokustack arrays
   -->
+  */
   for(let i = 0 ; i < 81 ; i++)
   {
     possiblenumbers[i] = [];
@@ -87,11 +90,13 @@ function initializearrays()
 }
 function findpossiblenumbers()
 {
+  /*
   <!--
   checks all cells that have value==0 and finds all possible numbers that can be placed there
   counts cells with value==0
   counts cells with value==0 and have possible numbers
   -->
+  */
   resetpossiblenumbers();
   possiblenumbersamount = 0;
   nullamount = 0;
@@ -113,6 +118,7 @@ function resetpossiblenumbers()
 }
 function checkcell(pos)
 {
+  /*
   <!--
   checks one place for all possible numbers that can be put there
   i = number that is being cheked
@@ -120,6 +126,7 @@ function checkcell(pos)
   if a number isnt found in row, collum and 3x3 grid
   then it is valid number and is placed in possiblenumbers array
   -->
+  */
   let row, col, row3x3, col3x3;
   let match = false;
   for(let i = 1 ; i < 10 ; i++)
@@ -144,16 +151,18 @@ function checkcell(pos)
 }
 function fillgrid()
 {
+  /*
   <!--
   ckecks possiblenumbers and if there are cells with only one possible number
   then it puts that number in sudokugridnew
   -->
+  */
   done = true;
-  for(int i = 0 ; i < 81 ; i++)
+  for(let i = 0 ; i < 81 ; i++)
   {
     if(possiblenumbers[i][0] == 1)
     {
-      for(int o = 1 ; o < 10 ; o++)
+      for(let o = 1 ; o < 10 ; o++)
       {
         if(possiblenumbers[i][o] != 0)
         {
@@ -167,11 +176,13 @@ function fillgrid()
 }
 function checksudoku()
 {
+  /*
   <!--
   checks sudoku if it has two of the same number in row, col or 3x3 grid
   if true, then it is ivnalid sudoku and returns false
   -->
-  let row, col row3x3, col3x3;
+  */
+  let row, col, row3x3, col3x3;
   for(let i = 0 ; i < 81 ; i++)
   {
     row = Math.floor(i/9);
@@ -197,7 +208,10 @@ function checksudoku()
 function savetostack()
 {
   writestack();
-  let result[location, selectednumber] = findsplitlocation();
+  let result = [];
+  result = findsplitlocation();
+  location = result[0];
+  selectednumber = result[1];
   sudokustack[stacknr][1] = location;
   sudokustack[stacknr][2] = selectednumber;
   sudokugridnew[location] = selectednumber;
@@ -205,13 +219,44 @@ function savetostack()
 }
 function loadfromstack()
 {
-  
+  let quessnumber;
+  readstack();
+  findpossiblenumbers();
+  location = sudokustack[stacknr][1];
+  selectednumber = sudokustack[stacknr][2];
+  possiblenumbers[location][selectednumber] = 0;
+  quessnumber = nextpossiblenumber();
+  if(quessnumber != 0)
+  {
+    sudokugridnew[location] = quessnumber;
+    sudokustack[stacknr][2] = quessnumber;
+  }
+  else
+  {
+    sudokustack[stacknr][0] = 0;
+    stacknr--;
+    location = sudokustack[stacknr][1];
+    selectednumber = sudokustack[stacknr][2];
+    if(stacknr == 0)
+    {
+      console.log("no solution found");
+      return 0;
+    }
+    loadfromstack();
+  }
+}
+function readstack()
+{
+  for(let i = 3 ; i < 84 ; i++)
+  {
+    sudokugridnew[i-3] = sudokustack[stacknr][i];
+  }
 }
 function writestack()
 {
-  for(int i = 3 ; i < 84 ; i++)
+  for(let i = 3 ; i < 84 ; i++)
   {
-    sudokustack[stacknr][i] = sudokugrid[i-3];
+    sudokustack[stacknr][i] = sudokugridnew[i-3];
   }
   sudokustack[stacknr][0] = 1;
   stacknr++;
@@ -220,18 +265,18 @@ function findsplitlocation()
 {
   let minchoce = 9;
   let location, selectednumber;
-  for(int i = 0 ; i < 81 ; i++)
+  for(let i = 0 ; i < 81 ; i++)
   {
     if(possiblenumbers[i][0] > 0)
       if(possiblenumbers[i][0] < minchoce)
         minchoce = possiblenumbers[i][0];
   }
-  for(int i = 0 ; i < 81 ; i++)
+  for(let i = 0 ; i < 81 ; i++)
   {
     if(possiblenumbers[i][0] == minchoce)
     {
       location = i;
-      for(int o = 1 ; o < 10 ; o++)
+      for(let o = 1 ; o < 10 ; o++)
       {
         if(possiblenumbers[i][o] != 0)
         {
@@ -242,9 +287,17 @@ function findsplitlocation()
     }
   }
 }
-
-
-
-
+function nextpossiblenumber()
+{
+  for(let i = selectednumber+1 ; i < 10 ; i++)
+  {
+    if(possiblenumbers[location][i] != 0)
+    {
+      selectednumber = i;
+      return i;
+    }
+  }
+  return 0;
+}
 
 
