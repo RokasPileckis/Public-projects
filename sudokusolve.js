@@ -21,14 +21,14 @@ function solve()
     fillgrid();
     if(!checksudoku)
     {
-      <!-- if(i == 0)sudoku invalid -->
+      if(i == 0)console.log("sudoku invalid");
       loadfromstack();
     }
     if(done && nullamount != 0) writestack();
     if(nullamount != possiblenumbersamount) loadfromstack();
     if(done || nullamount == 0)
     {
-      <!-- solution found -->
+      console.log("solution found");
       break;
     }
     if(i == n-1)
