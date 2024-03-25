@@ -14,19 +14,25 @@ function solve()
   initializearrays()
   readsudoku();
   printsudoku();
+  let i;
   
-  for(let i = 0 ; i < 1000 ; i++)
+  for(i = 0 ; i < 1000 ; i++)
   {
+    console.log("-----");
+    console.log("i: " + i);
     findpossiblenumbers();
     fillgrid();
+    console.log("possiblenumbersamount: " + possiblenumbersamount);
+    console.log("nullamount: " + nullamount);
+    console.log("done: " + done);
     if(!checksudoku)
     {
       if(i == 0)console.log("sudoku invalid");
       loadfromstack();
     }
-    if(done && nullamount != 0) writestack();
+    if(done && nullamount != 0) savetostack();
     if(nullamount != possiblenumbersamount) loadfromstack();
-    if(done || nullamount == 0)
+    if(checksudoku && nullamount == 0)
     {
       console.log("solution found");
       break;
@@ -37,6 +43,8 @@ function solve()
       return 0;
     }
   }
+  console.log("ciklu skaicius: " + i);
+  
   printsudoku();
 }
 
@@ -66,9 +74,7 @@ function printsudoku()
 function initializearrays()
 {
   /*
-  <!--
   creates possiblenumbers and sudokustack arrays
-  -->
   */
   for(let i = 0 ; i < 81 ; i++)
   {
@@ -91,11 +97,9 @@ function initializearrays()
 function findpossiblenumbers()
 {
   /*
-  <!--
   checks all cells that have value==0 and finds all possible numbers that can be placed there
   counts cells with value==0
   counts cells with value==0 and have possible numbers
-  -->
   */
   resetpossiblenumbers();
   possiblenumbersamount = 0;
@@ -119,13 +123,11 @@ function resetpossiblenumbers()
 function checkcell(pos)
 {
   /*
-  <!--
   checks one place for all possible numbers that can be put there
   i = number that is being cheked
   o = position in row, collum and 3x3 grid
   if a number isnt found in row, collum and 3x3 grid
   then it is valid number and is placed in possiblenumbers array
-  -->
   */
   let row, col, row3x3, col3x3;
   let match = false;
@@ -152,10 +154,8 @@ function checkcell(pos)
 function fillgrid()
 {
   /*
-  <!--
   ckecks possiblenumbers and if there are cells with only one possible number
   then it puts that number in sudokugridnew
-  -->
   */
   done = true;
   for(let i = 0 ; i < 81 ; i++)
@@ -177,10 +177,8 @@ function fillgrid()
 function checksudoku()
 {
   /*
-  <!--
   checks sudoku if it has two of the same number in row, col or 3x3 grid
   if true, then it is ivnalid sudoku and returns false
-  -->
   */
   let row, col, row3x3, col3x3;
   for(let i = 0 ; i < 81 ; i++)
@@ -207,11 +205,19 @@ function checksudoku()
 }
 function savetostack()
 {
+  /*
+  coppies current sudoju grid into stack and quesses a number
+  form possible numbers
+  */
+  let output = {location:0, selectednumber:0};
+  let location, selectednumber;
+  console.log("savetostack");
   writestack();
-  let result = [];
-  result = findsplitlocation();
-  location = result[0];
-  selectednumber = result[1];
+  findsplitlocation(output);
+  location = output.location;
+  selectednumber = output.selectednumber;
+  console.log("location " + location);
+  console.log("selectednumber " + selectednumber);
   sudokustack[stacknr][1] = location;
   sudokustack[stacknr][2] = selectednumber;
   sudokugridnew[location] = selectednumber;
@@ -256,12 +262,16 @@ function writestack()
 {
   for(let i = 3 ; i < 84 ; i++)
   {
+    //console.log(stacknr);
+    //console.log(i);
+    //console.log(sudokustack[stacknr][i]);
+    //console.log(sudokugridnew[i-3]);
     sudokustack[stacknr][i] = sudokugridnew[i-3];
   }
   sudokustack[stacknr][0] = 1;
   stacknr++;
 }
-function findsplitlocation()
+function findsplitlocation(output)
 {
   let minchoce = 9;
   let location, selectednumber;
@@ -281,7 +291,9 @@ function findsplitlocation()
         if(possiblenumbers[i][o] != 0)
         {
           selectednumber = o;
-          return [location, selectednumber];
+          output.location = location;
+          output.selectednumber = selectednumber;
+          return 0;
         }
       }
     }
