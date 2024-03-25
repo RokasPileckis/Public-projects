@@ -26,7 +26,16 @@ function solve()
     }
     if(done && nullamount != 0) writestack();
     if(nullamount != possiblenumbersamount) loadfromstack();
-    if(done || nullamount == 0)break;
+    if(done || nullamount == 0)
+    {
+      <!-- solution found -->
+      break;
+    }
+    if(i == n-1)
+    {
+      console.log("ciklu limitas pasiektas");
+      return 0;
+    }
   }
 }
 
