@@ -13,6 +13,7 @@ let nosolution = false;
 
 function solve()
 {
+  stackused = 0;
   nosolution = false;
   document.getElementById("output").innerHTML = "";
   nullamount = 0;
