@@ -13,6 +13,7 @@ let nosolution = false;
 
 function solve()
 {
+  nosolution = false;
   document.getElementById("output").innerHTML = "";
   nullamount = 0;
   possiblenumbersamount = 0;
@@ -24,15 +25,14 @@ function solve()
   
   for(i = 0 ; i < nmax ; i++)
   {
-    //console.log("-----");
-    //console.log("i: " + i);
+    console.log("-----");
+    console.log("i: " + i);
     findpossiblenumbers();
     fillgrid();
-    //console.log("possiblenumbersamount: " + possiblenumbersamount);
+    console.log("possiblenumbersamount: " + possiblenumbersamount);
     //console.log("nullamount: " + nullamount);
     //console.log("done: " + done);
-    //console.log("stacknr: " + stacknr);
-    //validsudoku = checksudoku
+    console.log("stacknr: " + stacknr);
     if(!checksudoku())
     {
       if(i == 0)console.log("sudoku invalid");
@@ -58,6 +58,8 @@ function solve()
     if(nosolution)
     {
       document.getElementById("output").innerHTML = "No solution found, sudoku invalid";
+      console.log("ciklu skaicius: " + i);
+      console.log("stack used: " + stackused);
       return 0;
     }
   }
