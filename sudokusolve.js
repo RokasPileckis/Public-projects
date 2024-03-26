@@ -7,14 +7,17 @@ let nullamount = 0;
 let possiblenumbersamount = 0;
 let done = false;
 let stacknr = 0;
-let maxstack = 50;
+let maxstack = 60;
 let stackused = 0;
 let nosolution = false;
+let numberofsolutions = 0;
 
 function solve()
 {
+  let allsolutions = false; //set true to find all solutions. sets nmax to 10^9
   stackused = 0;
   nosolution = false;
+  numberofsolutions = 0;
   document.getElementById("output").innerHTML = "";
   nullamount = 0;
   possiblenumbersamount = 0;
@@ -23,17 +26,12 @@ function solve()
   initializearrays()
   readsudoku();
   let i, nmax = 1000;
+  if(allsolutions)nmax = 1000000000;
   
   for(i = 0 ; i < nmax ; i++)
   {
-    console.log("-----");
-    console.log("i: " + i);
     findpossiblenumbers();
     fillgrid();
-    console.log("possiblenumbersamount: " + possiblenumbersamount);
-    //console.log("nullamount: " + nullamount);
-    //console.log("done: " + done);
-    console.log("stacknr: " + stacknr);
     if(!checksudoku())
     {
       if(i == 0)console.log("sudoku invalid");
@@ -44,11 +42,16 @@ function solve()
     if(checksudoku() && nullamount == 0)
     {
       console.log("solution found");
-      break;
+      if(allsolutions)console.log("i: " + i);
+      if(allsolutions)console.log("number of solutions: " + numberofsolutions);
+      numberofsolutions++;
+      if(allsolutions)loadfromstack();
+      else break;
     }
     if(i == nmax-1)
     {
       console.log("ciklu limitas pasiektas");
+      if(allsolutions) console.log("number of solutions: " + numberofsolutions);
       return 0;
     }
     if(stacknr == maxstack-1)
@@ -61,6 +64,7 @@ function solve()
       document.getElementById("output").innerHTML = "No solution found, sudoku invalid";
       console.log("ciklu skaicius: " + i);
       console.log("stack used: " + stackused);
+      if(allsolutions) console.log("number of solutions: " + numberofsolutions);
       return 0;
     }
   }
@@ -225,13 +229,10 @@ function savetostack()
   */
   let output = {location:0, selectednumber:0};
   let location, selectednumber;
-  //console.log("savetostack");
   writestack();
   findsplitlocation(output);
   location = output.location;
   selectednumber = output.selectednumber;
-  //console.log("location " + location);
-  //console.log("selectednumber " + selectednumber);
   sudokustack[stacknr][1] = location;
   sudokustack[stacknr][2] = selectednumber;
   sudokugridnew[location] = selectednumber;
@@ -239,6 +240,11 @@ function savetostack()
 }
 function loadfromstack()
 {
+  /*
+  coppies latest stack entry into sudoku grid and quesses next number 
+  from possible numbers in the same location
+  if no numbers are left then goes up a stack to next entry
+  */
   if(stacknr == 0)
   {
     console.log("no solution found");
@@ -285,6 +291,11 @@ function writestack()
 }
 function findsplitlocation(output)
 {
+  /*
+  when all empty cells have more than one possible number
+  find cell with least number of possibilities
+  and returns location and picked number
+  */
   let minchoce = 9;
   let location, selectednumber;
   for(let i = 0 ; i < 81 ; i++)
@@ -313,6 +324,10 @@ function findsplitlocation(output)
 }
 function nextpossiblenumber(location, selectednumber)
 {
+  /*
+  when readind from stack gets previos number location
+  and returns next possible number
+  */
   for(let i = selectednumber+1 ; i < 10 ; i++)
   {
     if(possiblenumbers[location][i] != 0)
@@ -336,7 +351,3 @@ function clearsolution()
 {
   printsudoku(sudokugrid);
 }
-
-
-
-
