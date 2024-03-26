@@ -1,46 +1,51 @@
 
-let sudokugrid = []; <!-- [81] -->
-let sudokugridnew = []; <!-- [81] -->
-let possiblenumbers = []; <!-- [81][10] -->
-let sudokustack = []; <!-- [15][84] -->
-let str = "";
+let sudokugrid = []; // [81]
+let sudokugridnew = []; // [81]
+let possiblenumbers = []; // [81][10]
+let sudokustack = []; // [maxstack][84]
 let nullamount = 0;
 let possiblenumbersamount = 0;
 let done = false;
 let stacknr = 0;
 let maxstack = 50;
+let stackused = 0;
+let nosolution = false;
 
 function solve()
 {
-  reset();
+  document.getElementById("output").innerHTML = "";
+  nullamount = 0;
+  possiblenumbersamount = 0;
+  done = false;
+  stacknr = 0;
   initializearrays()
   readsudoku();
-  printsudoku();
-  let i;
+  let i, nmax = 1000;
   
-  for(i = 0 ; i < 1000 ; i++)
+  for(i = 0 ; i < nmax ; i++)
   {
-    console.log("-----");
-    console.log("i: " + i);
+    //console.log("-----");
+    //console.log("i: " + i);
     findpossiblenumbers();
     fillgrid();
     //console.log("possiblenumbersamount: " + possiblenumbersamount);
     //console.log("nullamount: " + nullamount);
     //console.log("done: " + done);
-    console.log("stacknr: " + stacknr);
-    if(!checksudoku)
+    //console.log("stacknr: " + stacknr);
+    //validsudoku = checksudoku
+    if(!checksudoku())
     {
       if(i == 0)console.log("sudoku invalid");
       loadfromstack();
     }
     if(done && nullamount != 0) savetostack();
     if(nullamount != possiblenumbersamount) loadfromstack();
-    if(checksudoku && nullamount == 0)
+    if(checksudoku() && nullamount == 0)
     {
       console.log("solution found");
       break;
     }
-    if(i == 1000)
+    if(i == nmax-1)
     {
       console.log("ciklu limitas pasiektas");
       return 0;
@@ -50,10 +55,16 @@ function solve()
       console.log("stack limit reached");
       break;
     }
+    if(nosolution)
+    {
+      document.getElementById("output").innerHTML = "No solution found, sudoku invalid";
+      return 0;
+    }
   }
   console.log("ciklu skaicius: " + i);
+  console.log("stack used: " + stackused);
   
-  printsudoku();
+  printsudoku(sudokugridnew);
 }
 
 
@@ -65,19 +76,11 @@ function readsudoku()
     sudokugridnew[i] = sudokugrid[i];
   }
 }
-function printsudoku()
+function printsudoku(grid)
 {
-  let o = 0;
   for(let i = 0 ; i < 81 ; i++)
   {
-    str += sudokugridnew[i] + " ";
-    if((i+1) % 9 == 0)
-    {
-      o++;
-      //document.getElementById("output" + o).innerHTML = str;
-      console.log(str);
-      str = "";
-    }
+    document.getElementById("T" + (i+1)).innerHTML = grid[i];
   }
 }
 function initializearrays()
@@ -196,7 +199,6 @@ function checksudoku()
     row3x3 = Math.floor(row/3);
     col = i % 9;
     col3x3 = Math.floor(col/3);
-    
     for(let pos = 0 ; pos < 9 ; pos++)
     {
       if(sudokugridnew[i] != 0)
@@ -205,8 +207,8 @@ function checksudoku()
           if(sudokugridnew[i] == sudokugridnew[row*9 + pos])return false;
         if(i != pos*9 + col)
           if(sudokugridnew[i] == sudokugridnew[pos*9 + col])return false;
-        if(i != row3x3*27 + Math.floor(o/3)*9 + col3x3*3 + o%3)
-          if(sudokugridnew[i] == sudokugridnew[row3x3*27 + Math.floor(o/3)*9 + col3x3*3 + o%3])return false;
+        if(i != row3x3*27 + Math.floor(pos/3)*9 + col3x3*3 + pos%3)
+          if(sudokugridnew[i] == sudokugridnew[row3x3*27 + Math.floor(pos/3)*9 + col3x3*3 + pos%3])return false;
       }
     }
   }
@@ -220,13 +222,13 @@ function savetostack()
   */
   let output = {location:0, selectednumber:0};
   let location, selectednumber;
-  console.log("savetostack");
+  //console.log("savetostack");
   writestack();
   findsplitlocation(output);
   location = output.location;
   selectednumber = output.selectednumber;
-  console.log("location " + location);
-  console.log("selectednumber " + selectednumber);
+  //console.log("location " + location);
+  //console.log("selectednumber " + selectednumber);
   sudokustack[stacknr][1] = location;
   sudokustack[stacknr][2] = selectednumber;
   sudokugridnew[location] = selectednumber;
@@ -234,21 +236,19 @@ function savetostack()
 }
 function loadfromstack()
 {
-  printsudoku();
-  console.log("loadfromstack")
+  if(stacknr == 0)
+  {
+    console.log("no solution found");
+    nosolution = true;
+    return 0;
+  }
   let location, selectednumber, quessnumber;
   readstack();
-  console.log("read stack");
-  printsudoku();
   findpossiblenumbers();
   location = sudokustack[stacknr][1];
   selectednumber = sudokustack[stacknr][2];
   possiblenumbers[location][selectednumber] = 0;
   quessnumber = nextpossiblenumber(location, selectednumber);
-  console.log("location " + location);
-  console.log("selectednumber " + selectednumber);
-  console.log("possiblenumbersamount: " + possiblenumbersamount);
-  console.log("nullamount: " + nullamount);
   if(quessnumber != 0)
   {
     sudokugridnew[location] = quessnumber;
@@ -260,11 +260,6 @@ function loadfromstack()
     stacknr--;
     location = sudokustack[stacknr][1];
     selectednumber = sudokustack[stacknr][2];
-    if(stacknr == 0)
-    {
-      console.log("no solution found");
-      return 0;
-    }
     loadfromstack();
   }
 }
@@ -283,6 +278,7 @@ function writestack()
   }
   sudokustack[stacknr][0] = 1;
   stacknr++;
+  if(stacknr > stackused)stackused = stacknr;
 }
 function findsplitlocation(output)
 {
@@ -325,9 +321,19 @@ function nextpossiblenumber(location, selectednumber)
 }
 function reset()
 {
-  nullamount = 0;
-  possiblenumbersamount = 0;
-  done = false;
-  stacknr = 0;
+  for(let i = 0 ; i < 81 ; i++)
+  {
+    document.getElementById("T" + (i+1)).innerHTML = 0;
+    document.getElementById("T" + (i+1)).style.backgroundColor = "#D3D3D3";
+  }
+  document.getElementById("output").innerHTML = "";
+  readsudoku();
 }
+function clearsolution()
+{
+  printsudoku(sudokugrid);
+}
+
+
+
 
