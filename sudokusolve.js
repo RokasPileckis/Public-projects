@@ -11,6 +11,7 @@ let maxstack = 60;
 let stackused = 0;
 let nosolution = false;
 let numberofsolutions = 0;
+colorinput = "rgb(179, 179, 179)";
 
 function solve()
 {
@@ -23,7 +24,7 @@ function solve()
   possiblenumbersamount = 0;
   done = false;
   stacknr = 0;
-  initializearrays()
+  initializearrays();
   readsudoku();
   let i, nmax = 1000;
   if(allsolutions)nmax = 1000000000;
@@ -77,10 +78,20 @@ function solve()
 
 function readsudoku()
 {
+  let color;
   for(let i = 0 ; i < 81 ; i++)
   {
-    sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
-    sudokugridnew[i] = sudokugrid[i];
+    color = document.getElementById("T" + (i+1)).style.backgroundColor;
+    if(color == colorinput)
+    {
+      sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
+      sudokugridnew[i] = sudokugrid[i];
+    }
+    else
+    {
+      sudokugrid[i] = 0;
+      sudokugridnew[i] = sudokugrid[i];
+    }
   }
 }
 function printsudoku(grid)
