@@ -11,9 +11,10 @@ function highlight(thisid, input) {
   highlightid = Number(thisid.slice(1));
   newtr = thisid;
   if(input == 1)colortemp = colorbackgroud;
-  if(input == 2)colortemp = colorinput;
+  if(input == 2)colortemp = colorinput
   document.getElementById(oldtr).style.backgroundColor = colortemp;
   colortemp = document.getElementById(newtr).style.backgroundColor;
+  if(input == 3)colortemp = colorbackgroud;
   document.getElementById(newtr).style.backgroundColor = colorhighlight;
   if(newtr != oldtr)
   {
@@ -32,6 +33,7 @@ document.addEventListener("keydown", function onPress(event)
 
 
 function keypresed(key) {
+  console.log(key);
   switch(key)
   {
     case 96:
@@ -113,6 +115,16 @@ function keypresed(key) {
       highlightid += 9;
       if(highlightid > 81)highlightid -=81;
       highlight("T"+highlightid);
+      break;
+    case 8:
+      highlightid -= 1;
+      if(highlightid < 1)highlightid = 81;
+      highlight("T"+highlightid, 3);
+      document.getElementById(newtr).innerHTML = 0;
+      break;
+    case 46:
+      document.getElementById(newtr).innerHTML = 0;
+      highlight("T"+highlightid, 1);
       break;
   }
 }
