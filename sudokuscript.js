@@ -24,7 +24,8 @@ function highlight(thisid, input) {
 function numselect(thisid)
 {
   document.getElementById(newtr).innerHTML = document.getElementById(thisid).innerHTML;
-  document.getElementById(newtr).style.backgroundColor = colorinput;
+  highlight("T"+highlightid, 2);
+  //document.getElementById(newtr).style.backgroundColor = colorinput;
 }
 document.addEventListener("keydown", function onPress(event) 
 {
