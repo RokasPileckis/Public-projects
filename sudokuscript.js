@@ -1,8 +1,8 @@
 let oldtr = "T1";
 let newtr = "T1";;
 let highlightid = 0;
-let colorinput = "#b3b3b3";
-let colorhighlight = "#93D393";
+let colorinput = "rgb(179, 179, 179)";
+let colorhighlight = "rgb(147, 211, 147)";
 let colorbackgroud = "#D3D3D3";
 let colortemp = 0;
 
@@ -36,7 +36,7 @@ document.addEventListener("keydown", function onPress(event)
 
 
 function keypresed(key) {
-  console.log(key);
+  //console.log(key);
   switch(key)
   {
     case 96:
