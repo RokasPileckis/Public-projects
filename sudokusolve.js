@@ -1,4 +1,3 @@
-
 let sudokugrid = []; // [81]
 let sudokugridnew = []; // [81]
 let possiblenumbers = []; // [81][10]
@@ -11,7 +10,9 @@ let maxstack = 60;
 let stackused = 0;
 let nosolution = false;
 let numberofsolutions = 0;
-colorbackground = "rgb(211, 211, 211)";
+//colorbackground = "#D3D3D3";
+//colorinput = "rgb(147, 211, 147)";
+//colorhighlight = "rgb(179, 179, 179)";
 
 function solve()
 {
@@ -82,10 +83,12 @@ function readsudoku()
   for(let i = 0 ; i < 81 ; i++)
   {
     color = document.getElementById("T" + (i+1)).style.backgroundColor;
-    if(color != colorbackground)
+    //console.log(color);
+    if(color == colorinput || color == colorhighlight)
     {
       sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
       sudokugridnew[i] = sudokugrid[i];
+      //console.log(sudokugrid[i]);
     }
     else
     {
@@ -360,5 +363,6 @@ function reset()
 }
 function clearsolution()
 {
+  readsudoku();
   printsudoku(sudokugrid);
 }
