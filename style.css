@@ -25,7 +25,7 @@ body {
 .topnav a {
   float: left;
   display: block;
-  color: #f2f2f2;
+  color: #fcfcfc;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -40,17 +40,17 @@ body {
 .column {
   float: left;
   width: 33.33%;
-  padding: 20px;
+  padding: 0px;
 }
 
 .card {
   background-color: white;
   padding: 20px;
+  margin: 10px;
 }
 .row {
-  margin-top: 20px;
+  margin-top: 10px;
 }
-
 
 /* Clear floats after the columns */
 .row::after {
@@ -68,9 +68,8 @@ body {
 
 .image {
   background-color: #aaa;
-  width: 250px;
-  height: 250px;
-  padding: 20px;
+  width: 300px;
+  height: 300px;
 }
 
 
