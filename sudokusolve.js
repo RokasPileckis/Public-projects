@@ -339,7 +339,7 @@ function findsplitlocation(output)
 function nextpossiblenumber(location, selectednumber)
 {
   /*
-  when readind from stack gets previos number location
+  when reading from stack gets previos number location
   and returns next possible number
   */
   for(let i = selectednumber+1 ; i < 10 ; i++)
