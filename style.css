@@ -39,9 +39,13 @@ body {
 /* Create three equal columns that floats next to each other */
 .column {
   float: left;
-  width: 30%;
-  padding: 15px;
+  width: 33.33%;
+}
+
+.card {
   background-color: white;
+  padding: 20px;
+  margin-top: 20px;
 }
 
 /* Clear floats after the columns */
