@@ -57,15 +57,9 @@ body {
   }
 }
 
-/* Fake image */
-.fakeimg {
-  background-color: #aaa;
-  width: 100%;
-  padding: 20px;
-}
-
 .image {
-width="128" height="128"
+width="128";
+height="128";
 }
 
 
