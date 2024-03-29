@@ -40,13 +40,17 @@ body {
 .column {
   float: left;
   width: 33.33%;
+  padding: 20px;
 }
 
 .card {
   background-color: white;
   padding: 20px;
+}
+.row {
   margin-top: 20px;
 }
+
 
 /* Clear floats after the columns */
 .row::after {
