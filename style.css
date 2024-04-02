@@ -47,6 +47,9 @@ body {
   padding: 20px;
   margin: 10px;
 }
+.card:hover {
+  background-color: #e1e1ff;
+}
 .row {
   margin-top: 10px;
 }
