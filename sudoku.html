@@ -2,9 +2,9 @@
 <html>
 <head>
 <title>Sudoku solver</title>
+<link rel="stylesheet" href="style.css">
   
 <style>
-  body {background-color: #D3D3D3;}
   table{
     border: 4px solid black;
     border-collapse: collapse;
@@ -34,12 +34,22 @@
 </head>
   
 <body>
+<div class="header">
+  <h1>Sudoku solver</h1>
+  <p>Solves any sudoku puzzle</p>
+  <br>
+  <p>If a puzzle has more than 1 solution, the solver prints the first one it finds</p>
+</div>
 
-<h1>Sudoku solver</h1>
-<h3>Solves any sudoku puzzle</h3>
-<h3>If a puzzle has more than 1 solution, the solver prints the first one it finds</h3>
-<a href="index.html">Main page</a>
+<div class="topnav">
+  <a href="index.html">Main page</a>
+  <a href="sudoku.html">Sudoku</a>
+  <a href="#">Maze</a>
+  <a href="#" style="float:right">About me</a>
+</div>
 <br>
+  
+
 <button type="button" onclick="solve()">Solve</button>
 <button type="button" onclick="clearsolution()">Clear solution</button>
 <button type="button" onclick="reset()">Reset</button>
