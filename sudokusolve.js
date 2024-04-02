@@ -356,7 +356,7 @@ function reset()
   for(let i = 0 ; i < 81 ; i++)
   {
     document.getElementById("T" + (i+1)).innerHTML = 0;
-    document.getElementById("T" + (i+1)).style.backgroundColor = "#D3D3D3";
+    document.getElementById("T" + (i+1)).style.backgroundColor = document.body.style.backgroundColor;
   }
   document.getElementById("output").innerHTML = "";
   readsudoku();
