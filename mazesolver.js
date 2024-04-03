@@ -1,8 +1,9 @@
 let pixeldata;
 
-function loadFile = function(event) {
-	//var image = document.getElementById('output');
-	let image.src = URL.createObjectURL(event.target.files[0]);
+function loadFile(event) {
+	
+  let image = document.getElementById('output');
+  image.src = URL.createObjectURL(event.target.files[0]);
   let canvas = document.createElement('canvas');
   canvas.width = image.width;
   canvas.height = image.height;
