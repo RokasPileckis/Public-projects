@@ -1,10 +1,24 @@
 let pixeldata;
+let image;
 
 function loadFile(event) {
 	
-  let image = document.getElementById('output');
+  image = document.getElementById('output');
   image.src = URL.createObjectURL(event.target.files[0]);
-  let canvas = document.createElement('canvas');
+}
+function printpixeldata()
+{
+  console.log(pixeldata.data.length);
+  for(let i = 0 ; i < pixeldata.data.length ; i+=4)
+    console.log(pixeldata.data[i] + " " + pixeldata.data[i+1] + " " + pixeldata.data[i+2])
+}
+function solve()
+{
+  console.log(image.width);
+  console.log(image.height);
+  let canvas = document.getElementById('canvas');
+  //console.log(image.width);
+  //console.log(image.height);
   canvas.width = image.width;
   canvas.height = image.height;
 
@@ -15,8 +29,5 @@ function loadFile(event) {
 
   printpixeldata();
 }
-function printpixeldata()
-{
-  for(let i = 0 ; i < pixeldata.length ; i++)
-    console.log(pixeldata.data[i])
-}
+
+
