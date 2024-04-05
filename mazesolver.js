@@ -53,7 +53,9 @@ function findcolors()
 }
 function findexit()
 {
-  let exit1x = -1, exit1y = -1, exit2x = -1, exit2y = -1;
+  let exitnr;
+  let exit = [];
+  exit[0] = 0;
   let width = image.width;
   let height = image.height;
   let color = 0;
@@ -62,16 +64,12 @@ function findexit()
   {
     color = getcolor(i*4);
     if(color == colorwall) path = false;
-    if(color == colorpath && exit1y == -1)
+    if(color == colorpath && !path)
     {
-      exit1x = i;
-      exit1y = 0;
-      path = true;
-    }
-    if(color == colorpath && exit1y != -1 && !path)
-    {
-      exit2x = i;
-      exit2y = 0;
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = 0;
+      exit[exitnr+2] = i;
+      exit[0]++;
       path = true;
     }
     //print(color);
@@ -81,16 +79,12 @@ function findexit()
   {
     color = getcolor(i*width*4 + (width-1)*4);
     if(color == colorwall) path = false;
-    if(color == colorpath && exit1y == -1)
+    if(color == colorpath && !path)
     {
-      exit1x = width-1;
-      exit1y = i;
-      path = true;
-    }
-    if(color == colorpath && exit1y != -1 && !path)
-    {
-      exit2x = width-1;
-      exit2y = i;
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = i;
+      exit[exitnr+2] = width-1;
+      exit[0]++;
       path = true;
     }
     //print(color);
@@ -100,16 +94,12 @@ function findexit()
   {
     color = getcolor((width)*(height-1)*4 + i*4);
     if(color == colorwall) path = false;
-    if(color == colorpath && exit1y == -1)
+    if(color == colorpath && !path)
     {
-      exit1x = i;
-      exit1y = height-1;
-      path = true;
-    }
-    if(color == colorpath && exit1y != -1 && !path)
-    {
-      exit2x = i;
-      exit2y = height-1;
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = height-1;
+      exit[exitnr+2] = i;
+      exit[0]++;
       path = true;
     }
     //print(color);
@@ -119,23 +109,19 @@ function findexit()
   {
     color = getcolor(i*width*4);
     if(color == colorwall) path = false;
-    if(color == colorpath && exit1y == -1)
+    if(color == colorpath && !path)
     {
-      exit1x = 0;
-      exit1y = i;
-      path = true;
-    }
-    if(color == colorpath && exit1y != -1 && !path)
-    {
-      exit2x = 0;
-      exit2y = i;
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = i;
+      exit[exitnr+2] = 0;
+      exit[0]++;
       path = true;
     }
     //print(color);
     //print(path);
   }
-  print("exit 1yx: " + exit1y + " " + exit1x);
-  print("exit 2yx: " + exit2y + " " + exit2x);
+  for(let i = 0 ; i < exit[0] ; i++)
+    print("exit " + i + ": " + exit[i*2+1] + " " + exit[i*2+2]);
 }
 function getcolor(index)
 {
