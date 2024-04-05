@@ -2,35 +2,21 @@ let pixeldata;
 let image;
 let colorwall = 0;
 let colorpath = 0;
+let exit = [];
 
 function loadFile(event) 
 {
-	
   image = document.getElementById('output');
   image.src = URL.createObjectURL(event.target.files[0]);
 }
-function printpixeldata()
-{
-  for(let i = 0 ; i < pixeldata.data.length ; i+=4)
-    console.log(pixeldata.data[i] + " " + pixeldata.data[i+1] + " " + pixeldata.data[i+2])
-}
 function solve()
 {
-  print("-----")
-  console.log("width " + image.width);
-  console.log("height " + image.height);
-  let canvas = document.getElementById('canvas');
-  //console.log(image.width);
-  //console.log(image.height);
-  canvas.width = image.width;
-  canvas.height = image.height;
-
-  let context = canvas.getContext('2d', willReadFrequently = true);
-  context.drawImage(image, 0, 0);
+  setupcanvas();
   
-  pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
-  console.log("number of pixels " + pixeldata.data.length);
-  //printpixeldata();
+  print("-----")
+  print("width " + image.width);
+  print("height " + image.height);
+  print("number of pixels " + pixeldata.data.length);
   
   findcolors();
   findexit();
@@ -48,13 +34,12 @@ function findcolors()
       break;
     }
   }
-  console.log("wall " + colorwall);
-  console.log("path " + colorpath);
+  console.log("wall color: " + colorwall);
+  console.log("path color: " + colorpath);
 }
 function findexit()
 {
   let exitnr;
-  let exit = [];
   exit[0] = 0;
   let width = image.width;
   let height = image.height;
@@ -72,8 +57,6 @@ function findexit()
       exit[0]++;
       path = true;
     }
-    //print(color);
-    //print(path);
   }
   for(let i = 0 ; i < height ; i++)//right side
   {
@@ -87,8 +70,6 @@ function findexit()
       exit[0]++;
       path = true;
     }
-    //print(color);
-    //print(path);
   }
   for(let i = 0 ; i < width ; i++)//bottom side
   {
@@ -102,8 +83,6 @@ function findexit()
       exit[0]++;
       path = true;
     }
-    //print(color);
-    //print(path);
   }
   for(let i = 0 ; i < height ; i++)//left side
   {
@@ -117,9 +96,8 @@ function findexit()
       exit[0]++;
       path = true;
     }
-    //print(color);
-    //print(path);
   }
+  print("number of exits: " + exit[0]);
   for(let i = 0 ; i < exit[0] ; i++)
     print("exit " + i + ": " + exit[i*2+1] + " " + exit[i*2+2]);
 }
@@ -130,5 +108,15 @@ function getcolor(index)
 function print(text)
 {
   console.log(text);
+}
+function setupcanvas()
+{
+  let canvas = document.getElementById('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+
+  let context = canvas.getContext('2d', willReadFrequently = true);
+  context.drawImage(image, 0, 0);
+  pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
