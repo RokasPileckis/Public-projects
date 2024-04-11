@@ -34,8 +34,8 @@ function findcolors()
       break;
     }
   }
-  console.log("wall color: " + colorwall);
-  console.log("path color: " + colorpath);
+  print("wall color: " + colorwall);
+  print("path color: " + colorpath);
 }
 function findexit()
 {
@@ -119,4 +119,30 @@ function setupcanvas()
   context.drawImage(image, 0, 0);
   pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
 }
+//function find nodes
+//function connect nodes
+//function add nodes to list
+//function sort list
+//function draw nodes
+//function draw path
+//function nodes pixel size and wall thickness
+function nodesize()
+{
+  let width = image.width;
+  let height = image.height;
+  let wallthickness = width;
+  let paththickness = width;
+  let countwall = 0;
+  let countpath = 0;
+
+  for(let i = 0 ; i < width ; i++)
+    for(let o = 0 ; o < height ; o++)
+      {
+        
+      }
+  
+}
+
+
+
 
