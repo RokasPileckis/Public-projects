@@ -79,14 +79,14 @@ function solve()
 
 function readsudoku()
 {
-  let color;
+  let element;
   for(let i = 0 ; i < 81 ; i++)
   {
-    color = document.getElementById("T" + (i+1)).style.backgroundColor;
+    element = document.getElementById("T" + (i+1));
     //console.log(color);
-    if(color == colorinput || color == colorhighlight)
+    if(element.innerHTML != 0)
     {
-      sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
+      sudokugrid[i] = element.innerHTML;
       sudokugridnew[i] = sudokugrid[i];
       //console.log(sudokugrid[i]);
     }
