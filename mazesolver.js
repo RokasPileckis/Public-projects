@@ -20,6 +20,7 @@ function solve()
   
   findcolors();
   findexit();
+  nodesize();
 }
 function findcolors()
 {
@@ -134,15 +135,46 @@ function nodesize()
   let paththickness = width;
   let countwall = 0;
   let countpath = 0;
+  let index;
+  let color;
 
-  for(let i = 0 ; i < width ; i++)
-    for(let o = 0 ; o < height ; o++)
+  for(let i = 0 ; i < height ; i++)
+  {
+    countwall = 0;
+    countpath = 0;
+    for(let o = 0 ; o < width ; o++)
+    {
+      index = i * height + o;
+      color = getcolor(index*4);
+      //print(index + " " + color);
+      if(color == colorwall)
       {
-        
+        countwall++;
+        if(countpath > 0 && countpath < paththickness)
+        {
+          paththickness = countpath;
+          print("paththickness " + paththickness);
+          print("line " + i);
+        }
+          
+        countpath = 0;
       }
+      if(color == colorpath)
+      {
+        countpath++;
+        countwall = 0;
+        if(countwall > 0 && countwall < wallthickness)
+        {
+          wallthickness = countwall;
+          //print("wallthickness " + wallthickness);
+        }
+          
+        countwall = 0;
+      }
+    }
+  }
+  print("paththickness " + paththickness);
+  print("wallthickness " + wallthickness);
+    
   
 }
-
-
-
-
