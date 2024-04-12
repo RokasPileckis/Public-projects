@@ -146,29 +146,22 @@ function nodesize()
     {
       index = i * height + o;
       color = getcolor(index*4);
-      //print(index + " " + color);
       if(color == colorwall)
       {
         countwall++;
         if(countpath > 0 && countpath < paththickness)
         {
           paththickness = countpath;
-          print("paththickness " + paththickness);
-          print("line " + i);
         }
-          
         countpath = 0;
       }
       if(color == colorpath)
       {
         countpath++;
-        countwall = 0;
         if(countwall > 0 && countwall < wallthickness)
         {
           wallthickness = countwall;
-          //print("wallthickness " + wallthickness);
         }
-          
         countwall = 0;
       }
     }
