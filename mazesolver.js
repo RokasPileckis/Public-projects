@@ -183,7 +183,7 @@ function findnodes()
 {
   let node = {
     position: 0, //position in px in canvas
-    posx: 0, //position of node in node list
+    posx: 0, //position of node in node grid
     posy: 0,
     previosid: 0, //id of previos node in a* search
     ispath: false, //true if path, false if wall
@@ -225,7 +225,28 @@ function findnodes()
     
     if(possiblenodes[i].ispath)
     {
-      //if
+      if(possiblenodes[i].posx == 0)
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      if(possiblenodes[i].posx == cellshorizontal-1) 
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      if(possiblenodes[i].posy == 0) 
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      if(possiblenodes[i].posy == cellsvertical-1) 
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      
+      
     }
   }
   
