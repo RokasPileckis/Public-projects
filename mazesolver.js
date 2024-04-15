@@ -3,6 +3,10 @@ let image;
 let colorwall = 0;
 let colorpath = 0;
 let exit = [];
+let wallthickness;
+let paththickness;
+let cellsvertical;
+let cellshorizontal;
 
 function loadFile(event) 
 {
@@ -21,6 +25,7 @@ function solve()
   findcolors();
   findexit();
   nodesize();
+  findnodes();
 }
 function findcolors()
 {
@@ -131,8 +136,8 @@ function nodesize()
 {
   let width = image.width;
   let height = image.height;
-  let wallthickness = width;
-  let paththickness = width;
+  wallthickness = width;
+  paththickness = width;
   let countwall = 0;
   let countpath = 0;
   let index;
@@ -168,6 +173,73 @@ function nodesize()
   }
   print("paththickness " + paththickness);
   print("wallthickness " + wallthickness);
-    
+  cellsvertical = (height - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  cellshorizontal = (width - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  print("number of cells horizontal " + cellshorizontal);
+  print("number of cells vertical  " + cellsvertical);
   
 }
+function findnodes()
+{
+  let node = {
+    position: 0, //position in px in canvas
+    posx: 0, //position of node in node list
+    posy: 0,
+    previosid: 0, //id of previos node in a* search
+    ispath: false, //true if path, false if wall
+    isexit: false
+  };
+  let pos;
+  let color;
+  let possiblenodes = []; //list of all possible nodes, including walls
+  let nodes = []; //list of nodes of maze
+  let nr = 0;
+  for(let i = 0 ; i < cellsvertical ; i++)//find all nodes
+  {
+    for(let o = 0 ; o < cellshorizontal ; o++)
+    {
+      pos = nodeposition(o, i);
+      color = getcolor(pos*4);
+      if(color == colorwall)//wall node
+      {
+        possiblenodes[nr] = node;
+        possiblenodes[nr].position = pos;
+        possiblenodes[nr].posx = o;
+        possiblenodes[nr].posy = i;
+        possiblenodes[nr].ispath = false;
+        nr++;
+      }
+      if(color == colorpath)//path node
+      {
+        possiblenodes[nr] = node;
+        possiblenodes[nr].position = pos;
+        possiblenodes[nr].posx = o;
+        possiblenodes[nr].posy = i;
+        possiblenodes[nr].ispath = true;
+        nr++;
+      }
+    }
+  }
+  for(let i = 0 ; i < nr ; i++)//find maze nodes
+  {
+    
+    if(possiblenodes[i].ispath)
+    {
+      //if
+    }
+  }
+  
+  
+  
+  
+  
+}
+function nodeposition(x, y)
+{
+  let width = image.width;
+  posx = (Math.floor(x/2) * (wallthickness + paththickness)) + ((x%2) * wallthickness);
+  posy = ((Math.floor(y/2) * (wallthickness + paththickness)) + ((y%2) * wallthickness)) * width;
+  return posy+posx;
+}
+
+
