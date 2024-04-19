@@ -219,30 +219,15 @@ function findnodes()
   {
     if(possiblenodes[i].ispath)
     {
-      //print("path " + i);
-      if(possiblenodes[i].posx == 0)
-      {
-        possiblenodes[i].isexit = true;
-        nodes.push(possiblenodes[i]);
-      }
-      if(possiblenodes[i].posx == cellshorizontal-1) 
-      {
-        possiblenodes[i].isexit = true;
-        nodes.push(possiblenodes[i]);
-      }
-      if(possiblenodes[i].posy == 0) 
-      {
-        possiblenodes[i].isexit = true;
-        nodes.push(possiblenodes[i]);
-      }
-      if(possiblenodes[i].posy == cellsvertical-1) 
-      {
-        possiblenodes[i].isexit = true;
-        nodes.push(possiblenodes[i]);
-      }
       x = possiblenodes[i].posx;
       y = possiblenodes[i].posy;
-      if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
+      //print("path " + i);
+      if(x == 0 || x == cellshorizontal-1 || y == 0 || y == cellsvertical-1)
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      else if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
       {
         nodes.push(possiblenodes[i]);
         //print("push");
@@ -280,6 +265,7 @@ function printnodes(nodes)
   {
     string = "";
     string += "pos y x: " + nodes[i].posy + " " + nodes[i].posx;
+    if(nodes[i].isexit) string += " exit";
     print(string);
   }
 }
