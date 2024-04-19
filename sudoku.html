@@ -1,184 +1,185 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Sudoku solver</title>
-<link rel="stylesheet" href="style.css">
-  
-<style>
-  table{
-    border: 4px solid black;
-    border-collapse: collapse;
-  }
-  td {
-  width: 25px;
-  height: 25px;
-  text-align: center
-  }
-  
-  td:hover {background-color: #6E6E6E;}
+  <title>Sudoku solver</title>
+  <link rel="stylesheet" href="style.css">
 
-  tr.row {
-    border-bottom-style: solid;
-    border-width: 3px;
-  }
+  <style>
+    table {
+      border: 4px solid black;
+      border-collapse: collapse;
+    }
 
-  td.col {
-    border-right-style: solid;
-    border-width: 3px;
-  }
+    td {
+      width: 25px;
+      height: 25px;
+      text-align: center
+    }
 
-  .center {
-  margin: auto;
-  width: 30%;
-}
-</style>
-  
-  <script src="sudokuscript.js"></script>
-  <script src="sudokusolve.js"></script>
-  
+    td:hover {
+      background-color: #6E6E6E;
+    }
+
+    tr.row {
+      border-bottom-style: solid;
+      border-width: 3px;
+    }
+
+    td.col {
+      border-right-style: solid;
+      border-width: 3px;
+    }
+
+    .center {
+      margin: auto;
+      width: 30%;
+    }
+  </style>
+
+  <script src="sudokuscript.js" defer></script>
+  <script src="sudokusolve.js" defer></script>
+
 </head>
-  
+
 <body>
-<div class="header">
-  <h1>Sudoku solver</h1>
-  <p>Solves any sudoku puzzle</p>
-  <p>If a puzzle has more than 1 solution, the solver prints the first one it finds</p>
-</div>
+  <div class="header">
+    <h1>Sudoku solver</h1>
+    <p>Solves any sudoku puzzle</p>
+    <p>If a puzzle has more than 1 solution, the solver prints the first one it finds</p>
+  </div>
 
-<div class="topnav">
-  <a href="index.html">Main page</a>
-  <a href="sudoku.html">Sudoku</a>
-  <a href="maze.html">Maze</a>
-  <a href="#" style="float:right">About me</a>
-</div>
-<br>
-  
-<div class="center">
-<button type="button" onclick="solve()">Solve</button>
-<button type="button" onclick="clearsolution()">Clear solution</button>
-<button type="button" onclick="reset()">Reset</button>
-<br>
-<p id="output"></p>
-<!-- table, input with key presed. highlight selected -->
-<table>
-  <tr>
-    <td id="T1" onclick="highlight(id)">0</td>
-    <td id="T2" onclick="highlight(id)">0</td>
-    <td id="T3" onclick="highlight(id)" class="col">0</td>
-    <td id="T4" onclick="highlight(id)">0</td>
-    <td id="T5" onclick="highlight(id)">0</td>
-    <td id="T6" onclick="highlight(id)" class="col">0</td>
-    <td id="T7" onclick="highlight(id)">0</td>
-    <td id="T8" onclick="highlight(id)">0</td>
-    <td id="T9" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T10" onclick="highlight(id)">0</td>
-    <td id="T11" onclick="highlight(id)">0</td>
-    <td id="T12" onclick="highlight(id)" class="col">0</td>
-    <td id="T13" onclick="highlight(id)">0</td>
-    <td id="T14" onclick="highlight(id)">0</td>
-    <td id="T15" onclick="highlight(id)" class="col">0</td>
-    <td id="T16" onclick="highlight(id)">0</td>
-    <td id="T17" onclick="highlight(id)">0</td>
-    <td id="T18" onclick="highlight(id)">0</td>
-  </tr>
-  <tr class="row">
-    <td id="T19" onclick="highlight(id)">0</td>
-    <td id="T20" onclick="highlight(id)">0</td>
-    <td id="T21" onclick="highlight(id)" class="col">0</td>
-    <td id="T22" onclick="highlight(id)">0</td>
-    <td id="T23" onclick="highlight(id)">0</td>
-    <td id="T24" onclick="highlight(id)" class="col">0</td>
-    <td id="T25" onclick="highlight(id)">0</td>
-    <td id="T26" onclick="highlight(id)">0</td>
-    <td id="T27" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T28" onclick="highlight(id)">0</td>
-    <td id="T29" onclick="highlight(id)">0</td>
-    <td id="T30" onclick="highlight(id)" class="col">0</td>
-    <td id="T31" onclick="highlight(id)">0</td>
-    <td id="T32" onclick="highlight(id)">0</td>
-    <td id="T33" onclick="highlight(id)" class="col">0</td>
-    <td id="T34" onclick="highlight(id)">0</td>
-    <td id="T35" onclick="highlight(id)">0</td>
-    <td id="T36" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T37" onclick="highlight(id)">0</td>
-    <td id="T38" onclick="highlight(id)">0</td>
-    <td id="T39" onclick="highlight(id)" class="col">0</td>
-    <td id="T40" onclick="highlight(id)">0</td>
-    <td id="T41" onclick="highlight(id)">0</td>
-    <td id="T42" onclick="highlight(id)" class="col">0</td>
-    <td id="T43" onclick="highlight(id)">0</td>
-    <td id="T44" onclick="highlight(id)">0</td>
-    <td id="T45" onclick="highlight(id)">0</td>
-  </tr>
-  <tr class="row">
-    <td id="T46" onclick="highlight(id)">0</td>
-    <td id="T47" onclick="highlight(id)">0</td>
-    <td id="T48" onclick="highlight(id)" class="col">0</td>
-    <td id="T49" onclick="highlight(id)">0</td>
-    <td id="T50" onclick="highlight(id)">0</td>
-    <td id="T51" onclick="highlight(id)" class="col">0</td>
-    <td id="T52" onclick="highlight(id)">0</td>
-    <td id="T53" onclick="highlight(id)">0</td>
-    <td id="T54" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T55" onclick="highlight(id)">0</td>
-    <td id="T56" onclick="highlight(id)">0</td>
-    <td id="T57" onclick="highlight(id)" class="col">0</td>
-    <td id="T58" onclick="highlight(id)">0</td>
-    <td id="T59" onclick="highlight(id)">0</td>
-    <td id="T60" onclick="highlight(id)" class="col">0</td>
-    <td id="T61" onclick="highlight(id)">0</td>
-    <td id="T62" onclick="highlight(id)">0</td>
-    <td id="T63" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T64" onclick="highlight(id)">0</td>
-    <td id="T65" onclick="highlight(id)">0</td>
-    <td id="T66" onclick="highlight(id)" class="col">0</td>
-    <td id="T67" onclick="highlight(id)">0</td>
-    <td id="T68" onclick="highlight(id)">0</td>
-    <td id="T69" onclick="highlight(id)" class="col">0</td>
-    <td id="T70" onclick="highlight(id)">0</td>
-    <td id="T71" onclick="highlight(id)">0</td>
-    <td id="T72" onclick="highlight(id)">0</td>
-  </tr>
-  <tr>
-    <td id="T73" onclick="highlight(id)">0</td>
-    <td id="T74" onclick="highlight(id)">0</td>
-    <td id="T75" onclick="highlight(id)" class="col">0</td>
-    <td id="T76" onclick="highlight(id)">0</td>
-    <td id="T77" onclick="highlight(id)">0</td>
-    <td id="T78" onclick="highlight(id)" class="col">0</td>
-    <td id="T79" onclick="highlight(id)">0</td>
-    <td id="T80" onclick="highlight(id)">0</td>
-    <td id="T81" onclick="highlight(id)">0</td>
-  </tr>
-</table>
-<br>
-<table>
-  <tr>
-    <td id="N0" onclick="numselect(id)">0</td>
-    <td id="N1" onclick="numselect(id)">1</td>
-    <td id="N2" onclick="numselect(id)">2</td>
-    <td id="N3" onclick="numselect(id)">3</td>
-    <td id="N4" onclick="numselect(id)">4</td>
-    <td id="N5" onclick="numselect(id)">5</td>
-    <td id="N6" onclick="numselect(id)">6</td>
-    <td id="N7" onclick="numselect(id)">7</td>
-    <td id="N8" onclick="numselect(id)">8</td>
-    <td id="N9" onclick="numselect(id)">9</td>
-  </tr>
-</table>
-</div>
+  <div class="topnav">
+    <a href="index.html">Main page</a>
+    <a href="sudoku.html">Sudoku</a>
+    <a href="maze.html">Maze</a>
+    <a href="#" style="float:right">About me</a>
+  </div>
+  <br>
 
-
-
+  <div class="center">
+    <button type="button" onclick="solve()">Solve</button>
+    <button type="button" onclick="clearsolution()">Clear solution</button>
+    <button type="button" onclick="reset()">Reset</button>
+    <br>
+    <p id="output"></p>
+    <!-- table, input with key presed. highlight selected -->
+    <table>
+      <tr>
+        <td id="T1" onclick="highlight(id)">0</td>
+        <td id="T2" onclick="highlight(id)">0</td>
+        <td id="T3" onclick="highlight(id)" class="col">0</td>
+        <td id="T4" onclick="highlight(id)">0</td>
+        <td id="T5" onclick="highlight(id)">0</td>
+        <td id="T6" onclick="highlight(id)" class="col">0</td>
+        <td id="T7" onclick="highlight(id)">0</td>
+        <td id="T8" onclick="highlight(id)">0</td>
+        <td id="T9" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T10" onclick="highlight(id)">0</td>
+        <td id="T11" onclick="highlight(id)">0</td>
+        <td id="T12" onclick="highlight(id)" class="col">0</td>
+        <td id="T13" onclick="highlight(id)">0</td>
+        <td id="T14" onclick="highlight(id)">0</td>
+        <td id="T15" onclick="highlight(id)" class="col">0</td>
+        <td id="T16" onclick="highlight(id)">0</td>
+        <td id="T17" onclick="highlight(id)">0</td>
+        <td id="T18" onclick="highlight(id)">0</td>
+      </tr>
+      <tr class="row">
+        <td id="T19" onclick="highlight(id)">0</td>
+        <td id="T20" onclick="highlight(id)">0</td>
+        <td id="T21" onclick="highlight(id)" class="col">0</td>
+        <td id="T22" onclick="highlight(id)">0</td>
+        <td id="T23" onclick="highlight(id)">0</td>
+        <td id="T24" onclick="highlight(id)" class="col">0</td>
+        <td id="T25" onclick="highlight(id)">0</td>
+        <td id="T26" onclick="highlight(id)">0</td>
+        <td id="T27" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T28" onclick="highlight(id)">0</td>
+        <td id="T29" onclick="highlight(id)">0</td>
+        <td id="T30" onclick="highlight(id)" class="col">0</td>
+        <td id="T31" onclick="highlight(id)">0</td>
+        <td id="T32" onclick="highlight(id)">0</td>
+        <td id="T33" onclick="highlight(id)" class="col">0</td>
+        <td id="T34" onclick="highlight(id)">0</td>
+        <td id="T35" onclick="highlight(id)">0</td>
+        <td id="T36" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T37" onclick="highlight(id)">0</td>
+        <td id="T38" onclick="highlight(id)">0</td>
+        <td id="T39" onclick="highlight(id)" class="col">0</td>
+        <td id="T40" onclick="highlight(id)">0</td>
+        <td id="T41" onclick="highlight(id)">0</td>
+        <td id="T42" onclick="highlight(id)" class="col">0</td>
+        <td id="T43" onclick="highlight(id)">0</td>
+        <td id="T44" onclick="highlight(id)">0</td>
+        <td id="T45" onclick="highlight(id)">0</td>
+      </tr>
+      <tr class="row">
+        <td id="T46" onclick="highlight(id)">0</td>
+        <td id="T47" onclick="highlight(id)">0</td>
+        <td id="T48" onclick="highlight(id)" class="col">0</td>
+        <td id="T49" onclick="highlight(id)">0</td>
+        <td id="T50" onclick="highlight(id)">0</td>
+        <td id="T51" onclick="highlight(id)" class="col">0</td>
+        <td id="T52" onclick="highlight(id)">0</td>
+        <td id="T53" onclick="highlight(id)">0</td>
+        <td id="T54" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T55" onclick="highlight(id)">0</td>
+        <td id="T56" onclick="highlight(id)">0</td>
+        <td id="T57" onclick="highlight(id)" class="col">0</td>
+        <td id="T58" onclick="highlight(id)">0</td>
+        <td id="T59" onclick="highlight(id)">0</td>
+        <td id="T60" onclick="highlight(id)" class="col">0</td>
+        <td id="T61" onclick="highlight(id)">0</td>
+        <td id="T62" onclick="highlight(id)">0</td>
+        <td id="T63" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T64" onclick="highlight(id)">0</td>
+        <td id="T65" onclick="highlight(id)">0</td>
+        <td id="T66" onclick="highlight(id)" class="col">0</td>
+        <td id="T67" onclick="highlight(id)">0</td>
+        <td id="T68" onclick="highlight(id)">0</td>
+        <td id="T69" onclick="highlight(id)" class="col">0</td>
+        <td id="T70" onclick="highlight(id)">0</td>
+        <td id="T71" onclick="highlight(id)">0</td>
+        <td id="T72" onclick="highlight(id)">0</td>
+      </tr>
+      <tr>
+        <td id="T73" onclick="highlight(id)">0</td>
+        <td id="T74" onclick="highlight(id)">0</td>
+        <td id="T75" onclick="highlight(id)" class="col">0</td>
+        <td id="T76" onclick="highlight(id)">0</td>
+        <td id="T77" onclick="highlight(id)">0</td>
+        <td id="T78" onclick="highlight(id)" class="col">0</td>
+        <td id="T79" onclick="highlight(id)">0</td>
+        <td id="T80" onclick="highlight(id)">0</td>
+        <td id="T81" onclick="highlight(id)">0</td>
+      </tr>
+    </table>
+    <br>
+    <table>
+      <tr>
+        <td id="N0" onclick="numselect(id)">0</td>
+        <td id="N1" onclick="numselect(id)">1</td>
+        <td id="N2" onclick="numselect(id)">2</td>
+        <td id="N3" onclick="numselect(id)">3</td>
+        <td id="N4" onclick="numselect(id)">4</td>
+        <td id="N5" onclick="numselect(id)">5</td>
+        <td id="N6" onclick="numselect(id)">6</td>
+        <td id="N7" onclick="numselect(id)">7</td>
+        <td id="N8" onclick="numselect(id)">8</td>
+        <td id="N9" onclick="numselect(id)">9</td>
+      </tr>
+    </table>
+  </div>
 </body>
 </html>
