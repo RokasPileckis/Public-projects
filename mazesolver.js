@@ -187,6 +187,8 @@ function findnodes()
   let color;
   //let possiblenodes = []; //list of all possible nodes, including walls
   let nodes = []; //list of nodes of maze
+  possiblenodes.length = 0;
+  nodes.length = 0;
   let x, y;
   for(let i = 0 ; i < cellsvertical ; i++)//find all nodes
   {
@@ -214,14 +216,13 @@ function findnodes()
       }
     }
   }
-  print(possiblenodes.length);
+  //print(possiblenodes.length);
   for(let i = 0 ; i < possiblenodes.length ; i++)//find maze nodes
   {
     if(possiblenodes[i].ispath)
     {
       x = possiblenodes[i].posx;
       y = possiblenodes[i].posy;
-      //print("path " + i);
       if(x == 0 || x == cellshorizontal-1 || y == 0 || y == cellsvertical-1)
       {
         possiblenodes[i].isexit = true;
@@ -230,13 +231,11 @@ function findnodes()
       else if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
       {
         nodes.push(possiblenodes[i]);
-        //print("push");
       }
     }
   }
-  //print(possiblenodes.length);
-  //print(nodes.length);
-  printnodes(nodes);
+  print(nodes.length);
+  //printnodes(nodes);
 }
 function nodeposition(x, y)
 {
@@ -247,7 +246,6 @@ function nodeposition(x, y)
 }
 function getnodecolor(x, y)
 {
-  //print("getnodecolor");
   for(let i = 0 ; i < possiblenodes.length ; i++)
   {
     if(possiblenodes[i].posx == x && possiblenodes[i].posy == y)
