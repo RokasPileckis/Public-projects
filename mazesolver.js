@@ -127,13 +127,6 @@ function setupcanvas()
   context.drawImage(image, 0, 0);
   pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
 }
-//function find nodes
-//function connect nodes
-//function add nodes to list
-//function sort list
-//function draw nodes
-//function draw path
-//function nodes pixel size and wall thickness
 function nodesize()
 {
   let width = image.width;
@@ -268,4 +261,8 @@ function printnodes(node)
     print(string);
   }
 }
-
+//function connect nodes
+//function add nodes to list
+//function sort list
+//function draw nodes
+//function draw path
