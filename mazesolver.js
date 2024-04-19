@@ -8,6 +8,7 @@ let paththickness;
 let cellsvertical;
 let cellshorizontal;
 let possiblenodes = [];
+let nodes = [];
 
 function loadFile(event) 
 {
@@ -24,7 +25,7 @@ function solve()
   print("number of pixels " + pixeldata.data.length);
   
   findcolors();
-  findexit();
+  //findexit();
   nodesize();
   findnodes();
 }
@@ -172,21 +173,19 @@ function nodesize()
       }
     }
   }
-  print("paththickness " + paththickness);
-  print("wallthickness " + wallthickness);
   cellsvertical = (height - wallthickness)/(wallthickness + paththickness)*2 + 1;
   cellshorizontal = (width - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  
+  //print("paththickness " + paththickness);
+  //print("wallthickness " + wallthickness);
   print("number of cells horizontal " + cellshorizontal);
   print("number of cells vertical  " + cellsvertical);
-  
 }
 function findnodes()
 {
-  print("findnodes");
+  //print("findnodes");
   let pos;
   let color;
-  //let possiblenodes = []; //list of all possible nodes, including walls
-  let nodes = []; //list of nodes of maze
   possiblenodes.length = 0;
   nodes.length = 0;
   let x, y;
@@ -217,7 +216,9 @@ function findnodes()
     }
   }
   //print(possiblenodes.length);
-  for(let i = 0 ; i < possiblenodes.length ; i++)//find maze nodes
+  
+  //find corners and forks
+  for(let i = 0 ; i < possiblenodes.length ; i++)
   {
     if(possiblenodes[i].ispath)
     {
@@ -234,8 +235,8 @@ function findnodes()
       }
     }
   }
-  print(nodes.length);
-  //printnodes(nodes);
+  print("number of nodes: " + nodes.length);
+  printnodes(nodes);
 }
 function nodeposition(x, y)
 {
@@ -254,16 +255,16 @@ function getnodecolor(x, y)
     }
   }
 }
-function printnodes(nodes)
+function printnodes(node)
 {
-  print("printnodes");
-  print(nodes.length);
+  //print("printnodes");
+  //print(node.length);
   let string;
-  for(let i = 0 ; i < nodes.length ; i++)
+  for(let i = 0 ; i < node.length ; i++)
   {
     string = "";
-    string += "pos y x: " + nodes[i].posy + " " + nodes[i].posx;
-    if(nodes[i].isexit) string += " exit";
+    string += "pos y x: " + node[i].posy + " " + node[i].posx;
+    if(node[i].isexit) string += " exit";
     print(string);
   }
 }
