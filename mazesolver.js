@@ -7,6 +7,7 @@ let wallthickness;
 let paththickness;
 let cellsvertical;
 let cellshorizontal;
+let possiblenodes = [];
 
 function loadFile(event) 
 {
@@ -181,19 +182,12 @@ function nodesize()
 }
 function findnodes()
 {
-  let node = {
-    position: 0, //position in px in canvas
-    posx: 0, //position of node in node grid
-    posy: 0,
-    previosid: 0, //id of previos node in a* search
-    ispath: false, //true if path, false if wall
-    isexit: false
-  };
+  print("findnodes");
   let pos;
   let color;
-  let possiblenodes = []; //list of all possible nodes, including walls
+  //let possiblenodes = []; //list of all possible nodes, including walls
   let nodes = []; //list of nodes of maze
-  let nr = 0;
+  let x, y;
   for(let i = 0 ; i < cellsvertical ; i++)//find all nodes
   {
     for(let o = 0 ; o < cellshorizontal ; o++)
@@ -202,29 +196,30 @@ function findnodes()
       color = getcolor(pos*4);
       if(color == colorwall)//wall node
       {
-        possiblenodes[nr] = node;
-        possiblenodes[nr].position = pos;
-        possiblenodes[nr].posx = o;
-        possiblenodes[nr].posy = i;
-        possiblenodes[nr].ispath = false;
-        nr++;
+        possiblenodes.push({
+          position: pos,
+          posx: o,
+          posy: i,
+          ispath: false
+        });
       }
       if(color == colorpath)//path node
       {
-        possiblenodes[nr] = node;
-        possiblenodes[nr].position = pos;
-        possiblenodes[nr].posx = o;
-        possiblenodes[nr].posy = i;
-        possiblenodes[nr].ispath = true;
-        nr++;
+        possiblenodes.push({
+          position: pos,
+          posx: o,
+          posy: i,
+          ispath: true
+        });
       }
     }
   }
-  for(let i = 0 ; i < nr ; i++)//find maze nodes
+  print(possiblenodes.length);
+  for(let i = 0 ; i < possiblenodes.length ; i++)//find maze nodes
   {
-    
     if(possiblenodes[i].ispath)
     {
+      //print("path " + i);
       if(possiblenodes[i].posx == 0)
       {
         possiblenodes[i].isexit = true;
@@ -245,15 +240,18 @@ function findnodes()
         possiblenodes[i].isexit = true;
         nodes.push(possiblenodes[i]);
       }
-      
-      
+      x = possiblenodes[i].posx;
+      y = possiblenodes[i].posy;
+      if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
+      {
+        nodes.push(possiblenodes[i]);
+        //print("push");
+      }
     }
   }
-  
-  
-  
-  
-  
+  //print(possiblenodes.length);
+  //print(nodes.length);
+  printnodes(nodes);
 }
 function nodeposition(x, y)
 {
@@ -262,5 +260,27 @@ function nodeposition(x, y)
   posy = ((Math.floor(y/2) * (wallthickness + paththickness)) + ((y%2) * wallthickness)) * width;
   return posy+posx;
 }
-
+function getnodecolor(x, y)
+{
+  //print("getnodecolor");
+  for(let i = 0 ; i < possiblenodes.length ; i++)
+  {
+    if(possiblenodes[i].posx == x && possiblenodes[i].posy == y)
+    {
+      return getcolor(possiblenodes[i].position*4);
+    }
+  }
+}
+function printnodes(nodes)
+{
+  print("printnodes");
+  print(nodes.length);
+  let string;
+  for(let i = 0 ; i < nodes.length ; i++)
+  {
+    string = "";
+    string += "pos y x: " + nodes[i].posy + " " + nodes[i].posx;
+    print(string);
+  }
+}
 
