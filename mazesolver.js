@@ -262,6 +262,43 @@ function printnodes(node)
   }
 }
 //function connect nodes
+function connectnodes()
+{
+  /*
+  if neighbour is path, add this node to neighbour
+  */
+  let x, y;
+  let neighbourcount = 0;
+  for(let i = 0 ; i < nodes.length ; i++)
+  {
+    x = nodes[i].posx;
+    y = nodes[i].posy;
+    nodes[i].neighbour = [];
+    if(nodes[i].isexit)
+    {
+      
+    }
+    else
+    {
+      if(getnodecolor(x-1, y) == colorpath)//left
+      {
+        //nodes[i]
+      }
+      if(getnodecolor(x+1, y) == colorpath)//right
+      {
+        
+      }
+      if(getnodecolor(x, y-1) == colorpath)//bottom
+      {
+        
+      }
+      if(getnodecolor(x, y+1) == colorpath)//top
+      {
+        
+      }
+    }
+  }
+}
 //function add nodes to list
 //function sort list
 //function draw nodes
