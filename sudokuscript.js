@@ -3,7 +3,7 @@ let newtr = "T1";;
 let highlightid = 0;
 let colorinput = "rgb(179, 179, 179)";
 let colorhighlight = "rgb(147, 211, 147)";
-let colorbackgroud = document.body.style.backgroundColor;
+let colorbackgroud = "#D3D3D3";
 let colortemp = 0;
 
   
