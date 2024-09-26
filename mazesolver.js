@@ -290,7 +290,7 @@ function connectnodes()
       }
       if(getnodecolor(x, y-1) == colorpath)//bottom
       {
-        for(int o = i+1 ; o < nodes.length ; o++)
+        for(let o = i+1 ; o < nodes.length ; o++)
         {
           if(nodes[o].posx == x)
           {
@@ -301,7 +301,7 @@ function connectnodes()
       }
       if(getnodecolor(x, y+1) == colorpath)//top
       {
-        for(int o = i-1 ; o >= 0 ; o--)
+        for(let o = i-1 ; o >= 0 ; o--)
         {
           if(nodes[o].posx == x)
           {
