@@ -261,7 +261,6 @@ function printnodes(node)
     print(string);
   }
 }
-//function connect nodes
 function connectnodes()
 {
   /*
@@ -270,12 +269,15 @@ function connectnodes()
   let x, y, xmax, ymax;
   xmax = nodes[nodes.length-1].posx;
   ymax = nodes[nodes.length-1].posy;
-  let neighbourcount = 0;
   for(let i = 0 ; i < nodes.length ; i++)
   {
     x = nodes[i].posx;
     y = nodes[i].posy;
     nodes[i].neighbourid = [];
+    nodes[i].neighbourid[1] = -1;
+    nodes[i].neighbourid[2] = -1;
+    nodes[i].neighbourid[3] = -1;
+    nodes[i].neighbourid[4] = -1;
     if(nodes[i].isexit)
     {
       if(x == 0)//left
@@ -345,7 +347,14 @@ function connectnodes()
     }
   }
 }
-//function add nodes to list
+//function solve
+function solve()
+{
+  //find exit
+  //add neighbour to list
+  //sort list
+  //continue until second exit
+}
 //function sort list
 //function draw nodes
 //function draw path
