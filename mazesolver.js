@@ -9,6 +9,8 @@ let cellsvertical;
 let cellshorizontal;
 let possiblenodes = []; //list off all nodes, including walls
 let nodes = []; // list of path corners and junctions
+let exits = [];
+let pathlist = [];
 
 function loadFile(event) 
 {
@@ -25,9 +27,34 @@ function solve()
   print("number of pixels " + pixeldata.data.length);
   
   findcolors();
-  //findexit();
+  //findexitpixel();
   nodesize();
   findnodes();
+  connectnodes();
+  
+  
+  for(let i = 0 ; i < nodes.length ; i++)//find exits;
+  {
+    if(nodes.isexit)exits.push(nodes[i]);
+  }
+  //find closest exits
+  
+  
+  while(!pathlist[0].isexit)//main lood, until exit
+  {
+    
+  }
+  
+  for(let i = 0 ; i < 4 ; i++)
+  {
+    let id = exits[0].neighbourid[i];
+    if(id != -1)
+      pathlist.push(nodes[id]);
+  }
+  //add neighbour to list
+  //sort list
+  //continue until second exit
+  
 }
 function findcolors()
 {
@@ -45,7 +72,7 @@ function findcolors()
   print("wall color: " + colorwall);
   print("path color: " + colorpath);
 }
-function findexit()
+function findexitpixel()
 {
   let exitnr;
   exit[0] = 0;
@@ -347,14 +374,18 @@ function connectnodes()
     }
   }
 }
-//function solve
-function solve()
+function distanceaprox(i1, i2)
 {
-  //find exit
-  //add neighbour to list
-  //sort list
-  //continue until second exit
+  let x1, x2, y1, y2;
+  x1 = nodes[i1].posx;
+  x2 = nodes[i2].posx;
+  y1 = nodes[i1].posy;
+  y2 = nodes[i2].posy;
+  return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
 }
+
+  
+
 //function sort list
 //function draw nodes
 //function draw path
