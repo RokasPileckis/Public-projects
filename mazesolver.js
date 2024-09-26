@@ -7,8 +7,8 @@ let wallthickness;
 let paththickness;
 let cellsvertical;
 let cellshorizontal;
-let possiblenodes = [];
-let nodes = [];
+let possiblenodes = []; //list off all nodes, including walls
+let nodes = []; // list of path corners and junctions
 
 function loadFile(event) 
 {
@@ -273,7 +273,7 @@ function connectnodes()
   {
     x = nodes[i].posx;
     y = nodes[i].posy;
-    nodes[i].neighbour = [];
+    nodes[i].neighbourid = [];
     if(nodes[i].isexit)
     {
       
@@ -282,19 +282,33 @@ function connectnodes()
     {
       if(getnodecolor(x-1, y) == colorpath)//left
       {
-        //nodes[i]
+        nodes[i].neighbourid[1] = i-1;
       }
       if(getnodecolor(x+1, y) == colorpath)//right
       {
-        
+        nodes[i].neighbourid[2] = i+1;
       }
       if(getnodecolor(x, y-1) == colorpath)//bottom
       {
-        
+        for(int o = i+1 ; o < nodes.length ; o++)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[3] = o;
+            break;
+          }
+        }
       }
       if(getnodecolor(x, y+1) == colorpath)//top
       {
-        
+        for(int o = i-1 ; o >= 0 ; o--)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[3] = o;
+            break;
+          }
+        }
       }
     }
   }
