@@ -305,7 +305,7 @@ function connectnodes()
         {
           if(nodes[o].posx == x)
           {
-            nodes[i].neighbourid[3] = o;
+            nodes[i].neighbourid[4] = o;
             break;
           }
         }
