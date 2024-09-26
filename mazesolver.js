@@ -267,7 +267,9 @@ function connectnodes()
   /*
   if neighbour is path, add this node to neighbour
   */
-  let x, y;
+  let x, y, xmax, ymax;
+  xmax = nodes[nodes.length-1].posx;
+  ymax = nodes[nodes.length-1].posy;
   let neighbourcount = 0;
   for(let i = 0 ; i < nodes.length ; i++)
   {
@@ -276,6 +278,36 @@ function connectnodes()
     nodes[i].neighbourid = [];
     if(nodes[i].isexit)
     {
+      if(x == 0)//left
+      {
+        nodes[i].neighbourid[1] = i+1;
+      }
+      if(x == xmax)//right
+      {
+        nodes[i].neighbourid[2] = i-1;
+      }
+      if(y == 0)//top
+      {
+        for(let o = i+1 ; o < nodes.length ; o++)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[3] = o;
+            break;
+          }
+        }
+      }
+      if(y = ymax)//bottom
+      {
+        for(let o = i-1 ; o >= 0 ; o--)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[4] = o;
+            break;
+          }
+        }
+      }
       
     }
     else
