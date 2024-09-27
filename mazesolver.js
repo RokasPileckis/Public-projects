@@ -32,29 +32,6 @@ function solve()
   findnodes();
   connectnodes();
   
-  
-  for(let i = 0 ; i < nodes.length ; i++)//find exits;
-  {
-    if(nodes.isexit)exits.push(nodes[i]);
-  }
-  //find closest exits
-  
-  
-  while(!pathlist[0].isexit)//main lood, until exit
-  {
-    
-  }
-  
-  for(let i = 0 ; i < 4 ; i++)
-  {
-    let id = exits[0].neighbourid[i];
-    if(id != -1)
-      pathlist.push(nodes[id]);
-  }
-  //add neighbour to list
-  //sort list
-  //continue until second exit
-  
 }
 function findcolors()
 {
@@ -383,8 +360,47 @@ function distanceaprox(i1, i2)
   y2 = nodes[i2].posy;
   return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
 }
-
-  
+function astar()
+{
+  for(let i = 0 ; i < nodes.length ; i++)//find exits;
+  {
+    if(nodes.isexit)exits.push(nodes[i]);
+  }
+  while(!nodes[pathlist[0].id].isexit)//main lood, until exit
+  {
+    addneighbour(pathlist[0].id);//add neighbour to list
+    
+    //sort list
+    //continue until second exit
+  }
+}
+function addneighbour(oldid)
+{
+  let x, y, newid;
+  for(let i = 1 ; i < 5 ; i++)
+  {
+    newid = nodes[oldid].neighbourid[i];
+    if(newid != -1)
+    {
+      x = Math.abs(nodes[oldid].posx - nodes[newid].posx);
+      y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
+      nodes[newid].disstart = nodes[oldid].disstart + x + y;
+      
+      pathlist.push({
+        id: newid,
+        distance: disstart
+      })
+    }
+  }
+  if(pathlist.length > 1)//delete first element
+  {
+    for(let i = 0 ; i < pathlist.length-1 ; i++)
+    {
+      pathlist[i] = pathlist[i+1];
+    }
+    pathlist.length--;
+  }  
+}
 
 //function sort list
 //function draw nodes
