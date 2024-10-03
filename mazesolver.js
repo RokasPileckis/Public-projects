@@ -12,6 +12,7 @@ let nodes = []; // list of path corners and junctions
 let exits = [];
 let pathlist = [];
 
+
 function loadFile(event) 
 {
   image = document.getElementById('output');
@@ -30,8 +31,10 @@ function solve()
   //findexitpixel();
   nodesize();
   findnodes();
+  //printnodes(nodes);
   connectnodes();
   astar();
+  path();
 }
 function findcolors()
 {
@@ -198,7 +201,8 @@ function findnodes()
           position: pos,
           posx: o,
           posy: i,
-          ispath: false
+          ispath: false,
+          inlist: false
         });
       }
       if(color == colorpath)//path node
@@ -207,7 +211,8 @@ function findnodes()
           position: pos,
           posx: o,
           posy: i,
-          ispath: true
+          ispath: true,
+          inlist: false
         });
       }
     }
@@ -233,7 +238,7 @@ function findnodes()
     }
   }
   print("number of nodes: " + nodes.length);
-  printnodes(nodes);
+  //printnodes(nodes);
 }
 function nodeposition(x, y)
 {
@@ -260,7 +265,7 @@ function printnodes(node)
   for(let i = 0 ; i < node.length ; i++)
   {
     string = "";
-    string += "pos y x: " + node[i].posy + " " + node[i].posx;
+    string += "id: " + i +  " pos y x: " + node[i].posy + " " + node[i].posx;
     if(node[i].isexit) string += " exit";
     print(string);
   }
@@ -275,6 +280,7 @@ function connectnodes()
   ymax = nodes[nodes.length-1].posy;
   for(let i = 0 ; i < nodes.length ; i++)
   {
+    nodes[i].id = i;
     x = nodes[i].posx;
     y = nodes[i].posy;
     nodes[i].neighbourid = [];
@@ -282,7 +288,7 @@ function connectnodes()
     nodes[i].neighbourid[2] = -1;
     nodes[i].neighbourid[3] = -1;
     nodes[i].neighbourid[4] = -1;
-    if(nodes[i].isexit)
+    if(nodes[i].isexit)//if node is exit
     {
       if(x == 0)//left
       {
@@ -316,7 +322,7 @@ function connectnodes()
       }
       
     }
-    else
+    else//if node is not exit
     {
       if(getnodecolor(x-1, y) == colorpath)//left
       {
@@ -326,7 +332,7 @@ function connectnodes()
       {
         nodes[i].neighbourid[2] = i+1;
       }
-      if(getnodecolor(x, y-1) == colorpath)//bottom
+      if(getnodecolor(x, y+1) == colorpath)//bottom
       {
         for(let o = i+1 ; o < nodes.length ; o++)
         {
@@ -337,7 +343,7 @@ function connectnodes()
           }
         }
       }
-      if(getnodecolor(x, y+1) == colorpath)//top
+      if(getnodecolor(x, y-1) == colorpath)//top
       {
         for(let o = i-1 ; o >= 0 ; o--)
         {
@@ -349,6 +355,11 @@ function connectnodes()
         }
       }
     }
+    //print("id: " + i);
+    //print("nb1: " + nodes[i].neighbourid[1]);
+    //print("nb2: " + nodes[i].neighbourid[2]);
+    //print("nb3: " + nodes[i].neighbourid[3]);
+    //print("nb4: " + nodes[i].neighbourid[4]);
   }
 }
 function distanceaprox(i1, i2)
@@ -362,40 +373,56 @@ function distanceaprox(i1, i2)
 }
 function astar()
 {
+  print("a*");
   for(let i = 0 ; i < nodes.length ; i++)//find exits;
   {
-    if(nodes[i].isexit)exits.push(nodes[i]);
+    if(nodes[i].isexit)
+    {
+      exits.push(nodes[i]);
+      print("exit: " + i);
+    }
   }
-  pathlist.push({
-    id: newid,
-    distance: disstart
-      })
-  do //main loop, until exit
+  
+  pathlist.push({ //add first exit to path list
+    id: exits[0].id,
+    distance: 0
+    });
+      
+  nodes[pathlist[0].id].inlist = true;    
+  addneighbour(pathlist[0].id);//add neighbour to list
+  boublesort();//sort list
+  printlist();
+  //nodes[pathlist[0].id].isexit = false;
+  for(let i = 0 ; i < 1000 ; i++)//main loop
   {
+    if(nodes[pathlist[0].id].isexit)break;
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
-    
-    //continue until second exit
+    printlist();
+    //print(pathlist[0].id);
   }
-  while(!nodes[pathlist[0].id].isexit);
+  
   print("path found");
 }
 function addneighbour(oldid)
 {
   let x, y, newid;
-  for(let i = 1 ; i < 5 ; i++)
+  for(let i = 1 ; i < 5 ; i++)//loop through neighbours
   {
     newid = nodes[oldid].neighbourid[i];
-    if(newid != -1)
+    if(newid != -1 && !nodes[newid].inlist)
     {
+      //print(newid);
       x = Math.abs(nodes[oldid].posx - nodes[newid].posx);
       y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
       nodes[newid].disstart = nodes[oldid].disstart + x + y;
       
       pathlist.push({
         id: newid,
-        distance: disstart
-      })
+        distance: nodes[newid].disstart
+      });
+      nodes[newid].prenodeid = oldid;
+      nodes[newid].inlist = true;
     }
   }
   if(pathlist.length > 1)//delete first element
@@ -423,7 +450,37 @@ function boublesort()
     }
   }
 }
+function path()
+{
+  print("path:");
+  let newid;
+  let oldid;
+  oldid = pathlist[0].id;
+  print(oldid);
+  newid = nodes[oldid].prenodeid;
+  oldid = newid;
+  print(oldid);
+  for(let i = 0 ; i < 100 ; i++)
+  {
+    if(nodes[oldid].isexit)break;
+    newid = nodes[oldid].prenodeid;
+    oldid = newid;
+    print(oldid);
+  }
+  print("end of path");
+}
 
-//function sort list
 //function draw nodes
 //function draw path
+function printlist()
+{
+  print("list");
+  for(let i = 0 ; i < pathlist.length ; i++)
+  {
+    print(pathlist[i].id);
+  }
+  print("end of list");
+}
+
+
+
