@@ -31,7 +31,7 @@ function solve()
   nodesize();
   findnodes();
   connectnodes();
-  
+  astar();
 }
 function findcolors()
 {
@@ -364,15 +364,21 @@ function astar()
 {
   for(let i = 0 ; i < nodes.length ; i++)//find exits;
   {
-    if(nodes.isexit)exits.push(nodes[i]);
+    if(nodes[i].isexit)exits.push(nodes[i]);
   }
-  while(!nodes[pathlist[0].id].isexit)//main lood, until exit
+  pathlist.push({
+    id: newid,
+    distance: disstart
+      })
+  do //main loop, until exit
   {
     addneighbour(pathlist[0].id);//add neighbour to list
+    boublesort();//sort list
     
-    //sort list
     //continue until second exit
   }
+  while(!nodes[pathlist[0].id].isexit);
+  print("path found");
 }
 function addneighbour(oldid)
 {
@@ -400,6 +406,22 @@ function addneighbour(oldid)
     }
     pathlist.length--;
   }  
+}
+function boublesort()
+{
+  let temp;
+  for(let i = 0 ; i < pathlist.length-1 ; i++)
+  {
+    for(let o = 0 ; o < pathlist.length-i-1 ; o++)
+    {
+      if(pathlist[o].distance > pathlist[o+1].distance)
+      {
+        temp = pathlist[o+1];
+        pathlist[o+1] = pathlist[o];
+        pathlist[o] = temp;
+      }
+    }
+  }
 }
 
 //function sort list
