@@ -507,8 +507,3 @@ function drawpath()
   }
 }
 
-
-
-
-
-
