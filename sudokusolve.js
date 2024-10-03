@@ -1,368 +1,514 @@
-let sudokugrid = []; // [81]
-let sudokugridnew = []; // [81]
-let possiblenumbers = []; // [81][10]
-let sudokustack = []; // [maxstack][84]
-let nullamount = 0;
-let possiblenumbersamount = 0;
-let done = false;
-let stacknr = 0;
-let maxstack = 60;
-let stackused = 0;
-let nosolution = false;
-let numberofsolutions = 0;
-//colorbackground = "#D3D3D3";
-//colorinput = "rgb(147, 211, 147)";
-//colorhighlight = "rgb(179, 179, 179)";
+let pixeldata;
+let image;
+let colorwall = 0;
+let colorpath = 0;
+let exit = [];
+let wallthickness;
+let paththickness;
+let cellsvertical;
+let cellshorizontal;
+let possiblenodes = []; //list off all nodes, including walls
+let nodes = []; // list of path corners and junctions
+let exits = [];
+let pathlist = [];
+let context;
+let path = [];
 
+
+function loadFile(event) 
+{
+  image = document.getElementById('output');
+  image.src = URL.createObjectURL(event.target.files[0]);
+}
 function solve()
 {
-  let allsolutions = false; //set true to find all solutions. sets nmax to 10^9
-  stackused = 0;
-  nosolution = false;
-  numberofsolutions = 0;
-  document.getElementById("output").innerHTML = "";
-  nullamount = 0;
-  possiblenumbersamount = 0;
-  done = false;
-  stacknr = 0;
-  initializearrays();
-  readsudoku();
-  let i, nmax = 1000;
-  if(allsolutions)nmax = 1000000000;
+  setupcanvas();
   
-  for(i = 0 ; i < nmax ; i++)
+  print("-----")
+  print("width " + image.width);
+  print("height " + image.height);
+  print("number of pixels " + pixeldata.data.length);
+  
+  findcolors();
+  //findexitpixel();
+  nodesize();
+  findnodes();
+  //printnodes(nodes);
+  connectnodes();
+  astar();
+  findpath();
+  drawpath();
+}
+function findcolors()
+{
+  let colortemp = 0;
+  colorwall = getcolor(0);
+  for(let i = 0 ; i < pixeldata.data.length ; i+=4)
   {
-    findpossiblenumbers();
-    fillgrid();
-    if(!checksudoku())
+    colortemp = getcolor(i);
+    if(colorwall != colortemp)
     {
-      if(i == 0)console.log("sudoku invalid");
-      loadfromstack();
-    }
-    if(done && nullamount != 0) savetostack();
-    if(nullamount != possiblenumbersamount) loadfromstack();
-    if(checksudoku() && nullamount == 0)
-    {
-      console.log("solution found");
-      if(allsolutions)console.log("i: " + i);
-      if(allsolutions)console.log("number of solutions: " + numberofsolutions);
-      numberofsolutions++;
-      if(allsolutions)loadfromstack();
-      else break;
-    }
-    if(i == nmax-1)
-    {
-      console.log("ciklu limitas pasiektas");
-      if(allsolutions) console.log("number of solutions: " + numberofsolutions);
-      return 0;
-    }
-    if(stacknr == maxstack-1)
-    {
-      console.log("stack limit reached");
+      colorpath = colortemp;
       break;
     }
-    if(nosolution)
+  }
+  print("wall color: " + colorwall);
+  print("path color: " + colorpath);
+}
+function findexitpixel()
+{
+  let exitnr;
+  exit[0] = 0;
+  let width = image.width;
+  let height = image.height;
+  let color = 0;
+  let path = false;
+  for(let i = 0 ; i < width ; i++)//top side
+  {
+    color = getcolor(i*4);
+    if(color == colorwall) path = false;
+    if(color == colorpath && !path)
     {
-      document.getElementById("output").innerHTML = "No solution found, sudoku invalid";
-      console.log("ciklu skaicius: " + i);
-      console.log("stack used: " + stackused);
-      if(allsolutions) console.log("number of solutions: " + numberofsolutions);
-      return 0;
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = 0;
+      exit[exitnr+2] = i;
+      exit[0]++;
+      path = true;
     }
   }
-  console.log("ciklu skaicius: " + i);
-  console.log("stack used: " + stackused);
-  
-  printsudoku(sudokugridnew);
+  for(let i = 0 ; i < height ; i++)//right side
+  {
+    color = getcolor(i*width*4 + (width-1)*4);
+    if(color == colorwall) path = false;
+    if(color == colorpath && !path)
+    {
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = i;
+      exit[exitnr+2] = width-1;
+      exit[0]++;
+      path = true;
+    }
+  }
+  for(let i = 0 ; i < width ; i++)//bottom side
+  {
+    color = getcolor((width)*(height-1)*4 + i*4);
+    if(color == colorwall) path = false;
+    if(color == colorpath && !path)
+    {
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = height-1;
+      exit[exitnr+2] = i;
+      exit[0]++;
+      path = true;
+    }
+  }
+  for(let i = 0 ; i < height ; i++)//left side
+  {
+    color = getcolor(i*width*4);
+    if(color == colorwall) path = false;
+    if(color == colorpath && !path)
+    {
+      exitnr = exit[0]*2;
+      exit[exitnr+1] = i;
+      exit[exitnr+2] = 0;
+      exit[0]++;
+      path = true;
+    }
+  }
+  print("number of exits: " + exit[0]);
+  for(let i = 0 ; i < exit[0] ; i++)
+    print("exit " + i + ": " + exit[i*2+1] + " " + exit[i*2+2]);
 }
-
-
-function readsudoku()
+function getcolor(index)
 {
+  return pixeldata.data[index]*1000000 + pixeldata.data[index+1]*1000 + pixeldata.data[index+2];
+}
+function print(text)
+{
+  console.log(text);
+}
+function setupcanvas()
+{
+  let canvas = document.getElementById('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+
+  context = canvas.getContext('2d', willReadFrequently = true);
+  context.drawImage(image, 0, 0);
+  pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
+}
+function nodesize()
+{
+  let width = image.width;
+  let height = image.height;
+  wallthickness = width;
+  paththickness = width;
+  let countwall = 0;
+  let countpath = 0;
+  let index;
   let color;
-  for(let i = 0 ; i < 81 ; i++)
+
+  for(let i = 0 ; i < height ; i++)
   {
-    color = document.getElementById("T" + (i+1)).style.backgroundColor;
-    //console.log(color);
-    if(color == colorinput || color == colorhighlight)
+    countwall = 0;
+    countpath = 0;
+    for(let o = 0 ; o < width ; o++)
     {
-      sudokugrid[i] = document.getElementById("T" + (i+1)).innerHTML;
-      sudokugridnew[i] = sudokugrid[i];
-      //console.log(sudokugrid[i]);
-    }
-    else
-    {
-      sudokugrid[i] = 0;
-      sudokugridnew[i] = sudokugrid[i];
+      index = i * height + o;
+      color = getcolor(index*4);
+      if(color == colorwall)
+      {
+        countwall++;
+        if(countpath > 0 && countpath < paththickness)
+        {
+          paththickness = countpath;
+        }
+        countpath = 0;
+      }
+      if(color == colorpath)
+      {
+        countpath++;
+        if(countwall > 0 && countwall < wallthickness)
+        {
+          wallthickness = countwall;
+        }
+        countwall = 0;
+      }
     }
   }
+  cellsvertical = (height - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  cellshorizontal = (width - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  
+  //print("paththickness " + paththickness);
+  //print("wallthickness " + wallthickness);
+  print("number of cells horizontal " + cellshorizontal);
+  print("number of cells vertical  " + cellsvertical);
 }
-function printsudoku(grid)
+function findnodes()
 {
-  for(let i = 0 ; i < 81 ; i++)
+  //print("findnodes");
+  let pos;
+  let color;
+  possiblenodes.length = 0;
+  nodes.length = 0;
+  let x, y;
+  for(let i = 0 ; i < cellsvertical ; i++)//find all nodes
   {
-    document.getElementById("T" + (i+1)).innerHTML = grid[i];
+    for(let o = 0 ; o < cellshorizontal ; o++)
+    {
+      pos = nodeposition(o, i);
+      color = getcolor(pos*4);
+      if(color == colorwall)//wall node
+      {
+        possiblenodes.push({
+          position: pos,
+          posx: o,
+          posy: i,
+          ispath: false,
+          inlist: false
+        });
+      }
+      if(color == colorpath)//path node
+      {
+        possiblenodes.push({
+          position: pos,
+          posx: o,
+          posy: i,
+          ispath: true,
+          inlist: false
+        });
+      }
+    }
+  }
+  //print(possiblenodes.length);
+  
+  //find corners and forks
+  for(let i = 0 ; i < possiblenodes.length ; i++)
+  {
+    if(possiblenodes[i].ispath)
+    {
+      x = possiblenodes[i].posx;
+      y = possiblenodes[i].posy;
+      if(x == 0 || x == cellshorizontal-1 || y == 0 || y == cellsvertical-1)
+      {
+        possiblenodes[i].isexit = true;
+        nodes.push(possiblenodes[i]);
+      }
+      else if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
+      {
+        nodes.push(possiblenodes[i]);
+      }
+    }
+  }
+  print("number of nodes: " + nodes.length);
+  //printnodes(nodes);
+}
+function nodeposition(x, y)
+{
+  let width = image.width;
+  posx = (Math.floor(x/2) * (wallthickness + paththickness)) + ((x%2) * wallthickness);
+  posy = ((Math.floor(y/2) * (wallthickness + paththickness)) + ((y%2) * wallthickness)) * width;
+  return posy+posx;
+}
+function getnodecolor(x, y)
+{
+  for(let i = 0 ; i < possiblenodes.length ; i++)
+  {
+    if(possiblenodes[i].posx == x && possiblenodes[i].posy == y)
+    {
+      return getcolor(possiblenodes[i].position*4);
+    }
   }
 }
-function initializearrays()
+function printnodes(node)
+{
+  //print("printnodes");
+  //print(node.length);
+  let string;
+  for(let i = 0 ; i < node.length ; i++)
+  {
+    string = "";
+    string += "id: " + i +  " pos y x: " + node[i].posy + " " + node[i].posx;
+    if(node[i].isexit) string += " exit";
+    print(string);
+  }
+}
+function connectnodes()
 {
   /*
-  creates possiblenumbers and sudokustack arrays
+  if neighbour is path, add this node to neighbour
   */
-  for(let i = 0 ; i < 81 ; i++)
+  let x, y, xmax, ymax;
+  xmax = nodes[nodes.length-1].posx;
+  ymax = nodes[nodes.length-1].posy;
+  for(let i = 0 ; i < nodes.length ; i++)
   {
-    possiblenumbers[i] = [];
-    for(let o = 0 ; o < 10 ; o++)
+    nodes[i].id = i;
+    x = nodes[i].posx;
+    y = nodes[i].posy;
+    nodes[i].neighbourid = [];
+    nodes[i].neighbourid[1] = -1;
+    nodes[i].neighbourid[2] = -1;
+    nodes[i].neighbourid[3] = -1;
+    nodes[i].neighbourid[4] = -1;
+    if(nodes[i].isexit)//if node is exit
     {
-      possiblenumbers[i][o] = 0;
+      if(x == 0)//left
+      {
+        nodes[i].neighbourid[1] = i+1;
+      }
+      if(x == xmax)//right
+      {
+        nodes[i].neighbourid[2] = i-1;
+      }
+      if(y == 0)//top
+      {
+        for(let o = i+1 ; o < nodes.length ; o++)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[3] = o;
+            break;
+          }
+        }
+      }
+      if(y = ymax)//bottom
+      {
+        for(let o = i-1 ; o >= 0 ; o--)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[4] = o;
+            break;
+          }
+        }
+      }
+      
     }
-  }
-  for(let i = 0 ; i < maxstack ; i++)
-  {
-    sudokustack[i] = [];
-    for(let o = 0 ; o < 84 ; o++)
+    else//if node is not exit
     {
-      sudokustack[i][o] = 0;
+      if(getnodecolor(x-1, y) == colorpath)//left
+      {
+        nodes[i].neighbourid[1] = i-1;
+      }
+      if(getnodecolor(x+1, y) == colorpath)//right
+      {
+        nodes[i].neighbourid[2] = i+1;
+      }
+      if(getnodecolor(x, y+1) == colorpath)//bottom
+      {
+        for(let o = i+1 ; o < nodes.length ; o++)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[3] = o;
+            break;
+          }
+        }
+      }
+      if(getnodecolor(x, y-1) == colorpath)//top
+      {
+        for(let o = i-1 ; o >= 0 ; o--)
+        {
+          if(nodes[o].posx == x)
+          {
+            nodes[i].neighbourid[4] = o;
+            break;
+          }
+        }
+      }
+    }
+    //print("id: " + i);
+    //print("nb1: " + nodes[i].neighbourid[1]);
+    //print("nb2: " + nodes[i].neighbourid[2]);
+    //print("nb3: " + nodes[i].neighbourid[3]);
+    //print("nb4: " + nodes[i].neighbourid[4]);
+  }
+}
+function distanceaprox(i1, i2)
+{
+  let x1, x2, y1, y2;
+  x1 = nodes[i1].posx;
+  x2 = nodes[i2].posx;
+  y1 = nodes[i1].posy;
+  y2 = nodes[i2].posy;
+  return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+}
+function astar()
+{
+  print("a*");
+  for(let i = 0 ; i < nodes.length ; i++)//find exits;
+  {
+    if(nodes[i].isexit)
+    {
+      exits.push(nodes[i]);
+      print("exit: " + i);
     }
   }
   
-}
-function findpossiblenumbers()
-{
-  /*
-  checks all cells that have value==0 and finds all possible numbers that can be placed there
-  counts cells with value==0
-  counts cells with value==0 and have possible numbers
-  */
-  resetpossiblenumbers();
-  possiblenumbersamount = 0;
-  nullamount = 0;
-  for(let i = 0 ; i < 81 ; i++)
+  pathlist.push({ //add first exit to path list
+    id: exits[0].id,
+    distance: 0
+    });
+      
+  nodes[pathlist[0].id].inlist = true;    
+  addneighbour(pathlist[0].id);//add neighbour to list
+  boublesort();//sort list
+  //printlist();
+  //nodes[pathlist[0].id].isexit = false;
+  for(let i = 0 ; i < 1000 ; i++)//main loop
   {
-    if(sudokugridnew[i] == 0)
+    if(nodes[pathlist[0].id].isexit)break;
+    addneighbour(pathlist[0].id);//add neighbour to list
+    boublesort();//sort list
+    //printlist();
+    //print(pathlist[0].id);
+  }
+  
+  print("path found");
+}
+function addneighbour(oldid)
+{
+  let x, y, newid;
+  for(let i = 1 ; i < 5 ; i++)//loop through neighbours
+  {
+    newid = nodes[oldid].neighbourid[i];
+    if(newid != -1 && !nodes[newid].inlist)
     {
-      checkcell(i);
-      if(possiblenumbers[i][0] > 0)possiblenumbersamount++;
-      nullamount++;
+      //print(newid);
+      x = Math.abs(nodes[oldid].posx - nodes[newid].posx);
+      y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
+      nodes[newid].disstart = nodes[oldid].disstart + x + y;
+      
+      pathlist.push({
+        id: newid,
+        distance: nodes[newid].disstart
+      });
+      nodes[newid].prenodeid = oldid;
+      nodes[newid].inlist = true;
     }
   }
-}
-function resetpossiblenumbers()
-{
-  for(let i = 0 ; i < 81 ; i++)
-    for(let o = 0 ; o < 10 ; o++)
-      possiblenumbers[i][o] = 0;
-}
-function checkcell(pos)
-{
-  /*
-  checks one place for all possible numbers that can be put there
-  i = number that is being cheked
-  o = position in row, collum and 3x3 grid
-  if a number isnt found in row, collum and 3x3 grid
-  then it is valid number and is placed in possiblenumbers array
-  */
-  let row, col, row3x3, col3x3;
-  let match = false;
-  for(let i = 1 ; i < 10 ; i++)
+  if(pathlist.length > 1)//delete first element
   {
-    row = Math.floor(pos/9);
-    row3x3 = Math.floor(row/3);
-    col = pos % 9;
-    col3x3 = Math.floor(col/3);
-    match = false;
-    for(let o = 0 ; o < 9 ; o++)
+    for(let i = 0 ; i < pathlist.length-1 ; i++)
     {
-      if(i == sudokugridnew[row*9+o])match = true;
-      if(i == sudokugridnew[o*9+col])match = true;
-      if(i == sudokugridnew[row3x3*27 + Math.floor(o/3)*9 + col3x3*3 + o%3])match = true;
+      pathlist[i] = pathlist[i+1];
     }
-    if(!match) 
-    {
-      possiblenumbers[pos][i] = i;
-      possiblenumbers[pos][0]++;
-    }
-  }
+    pathlist.length--;
+  }  
 }
-function fillgrid()
+function boublesort()
 {
-  /*
-  ckecks possiblenumbers and if there are cells with only one possible number
-  then it puts that number in sudokugridnew
-  */
-  done = true;
-  for(let i = 0 ; i < 81 ; i++)
+  let temp;
+  for(let i = 0 ; i < pathlist.length-1 ; i++)
   {
-    if(possiblenumbers[i][0] == 1)
+    for(let o = 0 ; o < pathlist.length-i-1 ; o++)
     {
-      for(let o = 1 ; o < 10 ; o++)
+      if(pathlist[o].distance > pathlist[o+1].distance)
       {
-        if(possiblenumbers[i][o] != 0)
-        {
-          sudokugridnew[i] = possiblenumbers[i][o];
-          done = false;
-          break;
-        }
+        temp = pathlist[o+1];
+        pathlist[o+1] = pathlist[o];
+        pathlist[o] = temp;
       }
     }
   }
 }
-function checksudoku()
+function findpath()
 {
-  /*
-  checks sudoku if it has two of the same number in row, col or 3x3 grid
-  if true, then it is ivnalid sudoku and returns false
-  */
-  let row, col, row3x3, col3x3;
-  for(let i = 0 ; i < 81 ; i++)
+  let newid;
+  let oldid;
+  
+  oldid = pathlist[0].id;
+  
+  path.push(oldid);
+  
+  newid = nodes[oldid].prenodeid;
+  oldid = newid;
+  
+  path.push(oldid);
+  
+  for(let i = 0 ; i < 100 ; i++)
   {
-    row = Math.floor(i/9);
-    row3x3 = Math.floor(row/3);
-    col = i % 9;
-    col3x3 = Math.floor(col/3);
-    for(let pos = 0 ; pos < 9 ; pos++)
-    {
-      if(sudokugridnew[i] != 0)
-      {
-        if(i != row*9 + pos)
-          if(sudokugridnew[i] == sudokugridnew[row*9 + pos])return false;
-        if(i != pos*9 + col)
-          if(sudokugridnew[i] == sudokugridnew[pos*9 + col])return false;
-        if(i != row3x3*27 + Math.floor(pos/3)*9 + col3x3*3 + pos%3)
-          if(sudokugridnew[i] == sudokugridnew[row3x3*27 + Math.floor(pos/3)*9 + col3x3*3 + pos%3])return false;
-      }
-    }
-  }
-  return true;
-}
-function savetostack()
-{
-  /*
-  coppies current sudoju grid into stack and quesses a number
-  form possible numbers
-  */
-  let output = {location:0, selectednumber:0};
-  let location, selectednumber;
-  writestack();
-  findsplitlocation(output);
-  location = output.location;
-  selectednumber = output.selectednumber;
-  sudokustack[stacknr][1] = location;
-  sudokustack[stacknr][2] = selectednumber;
-  sudokugridnew[location] = selectednumber;
-  done = false;
-}
-function loadfromstack()
-{
-  /*
-  coppies latest stack entry into sudoku grid and quesses next number 
-  from possible numbers in the same location
-  if no numbers are left then goes up a stack to next entry
-  */
-  if(stacknr == 0)
-  {
-    console.log("no solution found");
-    nosolution = true;
-    return 0;
-  }
-  let location, selectednumber, quessnumber;
-  readstack();
-  findpossiblenumbers();
-  location = sudokustack[stacknr][1];
-  selectednumber = sudokustack[stacknr][2];
-  possiblenumbers[location][selectednumber] = 0;
-  quessnumber = nextpossiblenumber(location, selectednumber);
-  if(quessnumber != 0)
-  {
-    sudokugridnew[location] = quessnumber;
-    sudokustack[stacknr][2] = quessnumber;
-  }
-  else
-  {
-    sudokustack[stacknr][0] = 0;
-    stacknr--;
-    location = sudokustack[stacknr][1];
-    selectednumber = sudokustack[stacknr][2];
-    loadfromstack();
+    if(nodes[oldid].isexit)break;
+    newid = nodes[oldid].prenodeid;
+    oldid = newid;
+    
+    path.push(oldid);
   }
 }
-function readstack()
+
+
+//function draw path
+function printlist()
 {
-  for(let i = 3 ; i < 84 ; i++)
+  print("list");
+  for(let i = 0 ; i < pathlist.length ; i++)
   {
-    sudokugridnew[i-3] = sudokustack[stacknr-1][i];
+    print(pathlist[i].id);
+  }
+  print("end of list");
+}
+function drawnode(id, size)
+{
+  let x, y;
+  x = nodes[id].position % image.width;
+  y = Math.trunc(nodes[id].position / image.width); 
+  
+  context.fillStyle = "red";
+  context.fillRect(x, y, size, size);
+}
+function drawpath()
+{
+  for(let i = 0 ; i < path.length ; i++)
+  {
+    print(path[i]);
+    drawnode(path[i], paththickness);
+    //draw in between nodes
   }
 }
-function writestack()
-{
-  for(let i = 3 ; i < 84 ; i++)
-  {
-    sudokustack[stacknr][i] = sudokugridnew[i-3];
-  }
-  sudokustack[stacknr][0] = 1;
-  stacknr++;
-  if(stacknr > stackused)stackused = stacknr;
-}
-function findsplitlocation(output)
-{
-  /*
-  when all empty cells have more than one possible number
-  find cell with least number of possibilities
-  and returns location and picked number
-  */
-  let minchoce = 9;
-  let location, selectednumber;
-  for(let i = 0 ; i < 81 ; i++)
-  {
-    if(possiblenumbers[i][0] > 0)
-      if(possiblenumbers[i][0] < minchoce)
-        minchoce = possiblenumbers[i][0];
-  }
-  for(let i = 0 ; i < 81 ; i++)
-  {
-    if(possiblenumbers[i][0] == minchoce)
-    {
-      location = i;
-      for(let o = 1 ; o < 10 ; o++)
-      {
-        if(possiblenumbers[i][o] != 0)
-        {
-          selectednumber = o;
-          output.location = location;
-          output.selectednumber = selectednumber;
-          return 0;
-        }
-      }
-    }
-  }
-}
-function nextpossiblenumber(location, selectednumber)
-{
-  /*
-  when reading from stack gets previos number location
-  and returns next possible number
-  */
-  for(let i = selectednumber+1 ; i < 10 ; i++)
-  {
-    if(possiblenumbers[location][i] != 0)
-    {
-      return i;
-    }
-  }
-  return 0;
-}
-function reset()
-{
-  for(let i = 0 ; i < 81 ; i++)
-  {
-    document.getElementById("T" + (i+1)).innerHTML = 0;
-    document.getElementById("T" + (i+1)).style.backgroundColor = document.body.style.backgroundColor;
-  }
-  document.getElementById("output").innerHTML = "";
-  readsudoku();
-}
-function clearsolution()
-{
-  readsudoku();
-  printsudoku(sudokugrid);
-}
+
+
+
+
+
+
