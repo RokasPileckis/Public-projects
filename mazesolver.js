@@ -22,7 +22,9 @@ function loadFile(event)
 }
 function solve()
 {
+  reset();
   setupcanvas();
+  
   
   print("-----")
   print("width " + image.width);
@@ -506,4 +508,23 @@ function drawpath()
     //draw in between nodes
   }
 }
+
+function reset()
+{
+  colorwall = 0;
+  colorpath = 0;
+  exit = [];
+  wallthickness = 0;
+  paththickness = 0;
+  cellsvertical = 0;
+  cellshorizontal = 0;
+  possiblenodes = [];
+  nodes = [];
+  exits = [];
+  pathlist = [];
+  path = [];
+}
+
+
+
 
