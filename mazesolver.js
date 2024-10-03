@@ -11,6 +11,8 @@ let possiblenodes = []; //list off all nodes, including walls
 let nodes = []; // list of path corners and junctions
 let exits = [];
 let pathlist = [];
+let context;
+let path = [];
 
 
 function loadFile(event) 
@@ -34,7 +36,8 @@ function solve()
   //printnodes(nodes);
   connectnodes();
   astar();
-  path();
+  findpath();
+  drawpath();
 }
 function findcolors()
 {
@@ -130,7 +133,7 @@ function setupcanvas()
   canvas.width = image.width;
   canvas.height = image.height;
 
-  let context = canvas.getContext('2d', willReadFrequently = true);
+  context = canvas.getContext('2d', willReadFrequently = true);
   context.drawImage(image, 0, 0);
   pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
 }
@@ -391,14 +394,14 @@ function astar()
   nodes[pathlist[0].id].inlist = true;    
   addneighbour(pathlist[0].id);//add neighbour to list
   boublesort();//sort list
-  printlist();
+  //printlist();
   //nodes[pathlist[0].id].isexit = false;
   for(let i = 0 ; i < 1000 ; i++)//main loop
   {
     if(nodes[pathlist[0].id].isexit)break;
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
-    printlist();
+    //printlist();
     //print(pathlist[0].id);
   }
   
@@ -450,27 +453,31 @@ function boublesort()
     }
   }
 }
-function path()
+function findpath()
 {
-  print("path:");
   let newid;
   let oldid;
+  
   oldid = pathlist[0].id;
-  print(oldid);
+  
+  path.push(oldid);
+  
   newid = nodes[oldid].prenodeid;
   oldid = newid;
-  print(oldid);
+  
+  path.push(oldid);
+  
   for(let i = 0 ; i < 100 ; i++)
   {
     if(nodes[oldid].isexit)break;
     newid = nodes[oldid].prenodeid;
     oldid = newid;
-    print(oldid);
+    
+    path.push(oldid);
   }
-  print("end of path");
 }
 
-//function draw nodes
+
 //function draw path
 function printlist()
 {
@@ -481,6 +488,27 @@ function printlist()
   }
   print("end of list");
 }
+function drawnode(id, size)
+{
+  let x, y;
+  x = nodes[id].position % image.width;
+  y = Math.trunc(nodes[id].position / image.width); 
+  
+  context.fillStyle = "red";
+  context.fillRect(x, y, size, size);
+}
+function drawpath()
+{
+  for(let i = 0 ; i < path.length ; i++)
+  {
+    print(path[i]);
+    drawnode(path[i], paththickness);
+    //draw in between nodes
+  }
+}
+
+
+
 
 
 
