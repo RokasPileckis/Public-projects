@@ -404,8 +404,8 @@ function astar()
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
     i++;
-    if(i%1000 == 0)print(i);
-    if(i>5000)break;
+    //if(i%1000 == 0)print(i);
+    //if(i>5000)break;
     //print(pathlist[0].id);
     //print(pathlist.length);
     //print(i);
@@ -477,7 +477,7 @@ function findpath()
   
   path.push(oldid);
   
-  for(let i = 0 ; i < 1000 ; i++)
+  for(let i = 0 ; i < 1000000 ; i++)
   {
     if(nodes[oldid].isexit)break;
     newid = nodes[oldid].prenodeid;
