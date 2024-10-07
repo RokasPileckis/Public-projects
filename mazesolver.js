@@ -25,7 +25,6 @@ function solve()
   reset();
   setupcanvas();
   
-  
   print("-----")
   print("width " + image.width);
   print("height " + image.height);
@@ -38,6 +37,7 @@ function solve()
   //printnodes(nodes);
   connectnodes();
   astar();
+  if(pathlist.length == 0)return;
   findpath();
   drawpath();
 }
@@ -394,20 +394,27 @@ function astar()
     });
       
   nodes[pathlist[0].id].inlist = true;    
-  addneighbour(pathlist[0].id);//add neighbour to list
-  boublesort();//sort list
   //printlist();
-  //nodes[pathlist[0].id].isexit = false;
-  for(let i = 0 ; i < 1000 ; i++)//main loop
+  
+  let i = 0;
+  while(pathlist.length>0)
   {
-    if(nodes[pathlist[0].id].isexit)break;
+    if(i>0)
+      if(nodes[pathlist[0].id].isexit)break;
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
-    //printlist();
+    i++;
+    if(i%1000 == 0)print(i);
+    if(i>5000)break;
     //print(pathlist[0].id);
+    //print(pathlist.length);
+    //print(i);
+    //printlist();
   }
-  
-  print("path found");
+  print(i);
+  if(pathlist.length > 0)
+    print("path found");
+  else print("failed");
 }
 function addneighbour(oldid)
 {
@@ -424,7 +431,7 @@ function addneighbour(oldid)
       
       pathlist.push({
         id: newid,
-        distance: nodes[newid].disstart
+        distance: nodes[newid].disstart + distanceaprox(newid, exits[1].id)
       });
       nodes[newid].prenodeid = oldid;
       nodes[newid].inlist = true;
@@ -437,7 +444,8 @@ function addneighbour(oldid)
       pathlist[i] = pathlist[i+1];
     }
     pathlist.length--;
-  }  
+  }
+  else pathlist.length--;
 }
 function boublesort()
 {
@@ -469,7 +477,7 @@ function findpath()
   
   path.push(oldid);
   
-  for(let i = 0 ; i < 100 ; i++)
+  for(let i = 0 ; i < 1000 ; i++)
   {
     if(nodes[oldid].isexit)break;
     newid = nodes[oldid].prenodeid;
@@ -477,10 +485,8 @@ function findpath()
     
     path.push(oldid);
   }
+  
 }
-
-
-//function draw path
 function printlist()
 {
   print("list");
@@ -490,25 +496,26 @@ function printlist()
   }
   print("end of list");
 }
-function drawnode(id, size)
+function drawnode(px, py)
 {
   let x, y;
-  x = nodes[id].position % image.width;
-  y = Math.trunc(nodes[id].position / image.width); 
+  x = nodeposition(px, py) % image.width;
+  y = Math.floor(nodeposition(px, py) / image.width);
   
   context.fillStyle = "red";
-  context.fillRect(x, y, size, size);
+  context.fillRect(x, y, paththickness, paththickness);
 }
 function drawpath()
 {
   for(let i = 0 ; i < path.length ; i++)
   {
-    print(path[i]);
-    drawnode(path[i], paththickness);
+    let id = path[i];
+    drawnode(nodes[id].posx, nodes[id].posy);
     //draw in between nodes
+    if(i < path.length-1)
+      drawgap(path[i], path[i+1]);
   }
 }
-
 function reset()
 {
   colorwall = 0;
@@ -518,13 +525,52 @@ function reset()
   paththickness = 0;
   cellsvertical = 0;
   cellshorizontal = 0;
-  possiblenodes = [];
-  nodes = [];
+  possiblenodes = []; //list off all nodes, including walls
+  nodes = []; // list of path corners and junctions
   exits = [];
   pathlist = [];
   path = [];
 }
-
-
+function drawgap(id1, id2)
+{
+  let x1, x2, y1, y2, id, dx, dy;
+  x1 = nodes[id1].posx;
+  x2 = nodes[id2].posx;
+  y1 = nodes[id1].posy;
+  y2 = nodes[id2].posy;
+  dx = x1 - x2;
+  dy = y1 - y2;
+  
+  if(dx>1)
+  {
+    for(let i = x2+1 ; i < x1 ; i++)
+    {
+      drawnode(i, y1);
+    }
+  }
+  if(dx<1)
+  {
+    for(let i = x1+1 ; i < x2 ; i++)
+    {
+      drawnode(i, y1);
+    }
+  }
+  if(dy>1)
+  {
+    for(let i = y2+1 ; i < y1 ; i++)
+    {
+      drawnode(x1, i);
+    }
+  }
+  if(dy<1)
+  {
+    for(let i = y1+1 ; i < y2 ; i++)
+    {
+      drawnode(x1, i);
+    }
+  }
+}
+//debug function
+//draw nodes in pathlist and buton to increment the main loop
 
 
