@@ -40,6 +40,7 @@ function solve()
   if(pathlist.length == 0)return;
   findpath();
   drawpath();
+  print("path length in cells: " + pathlist[0].distance);
 }
 function findcolors()
 {
@@ -393,7 +394,8 @@ function astar()
     distance: 0
     });
       
-  nodes[pathlist[0].id].inlist = true;    
+  nodes[pathlist[0].id].inlist = true;   
+  nodes[pathlist[0].id].disstart = 0;
   //printlist();
   
   let i = 0;
@@ -404,6 +406,7 @@ function astar()
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
     i++;
+    //print(pathlist[0].distance);
     //if(i%1000 == 0)print(i);
     //if(i>5000)break;
     //print(pathlist[0].id);
@@ -428,10 +431,12 @@ function addneighbour(oldid)
       x = Math.abs(nodes[oldid].posx - nodes[newid].posx);
       y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
       nodes[newid].disstart = nodes[oldid].disstart + x + y;
+      //print(nodes[oldid].disstart);
       
       pathlist.push({
         id: newid,
         distance: nodes[newid].disstart + distanceaprox(newid, exits[1].id)
+        
       });
       nodes[newid].prenodeid = oldid;
       nodes[newid].inlist = true;
@@ -485,7 +490,7 @@ function findpath()
     
     path.push(oldid);
   }
-  
+  print("path length in nodes: " + path.length);
 }
 function printlist()
 {
