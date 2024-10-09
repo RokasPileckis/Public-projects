@@ -7,7 +7,6 @@ let wallthickness;
 let paththickness;
 let cellsvertical;
 let cellshorizontal;
-let possiblenodes = []; //list off all nodes, including walls
 let nodes = []; // list of path corners and junctions
 let exits = [];
 let pathlist = [];
@@ -41,6 +40,9 @@ function solve()
   findpath();
   drawpath();
   print("path length in cells: " + pathlist[0].distance);
+  
+  //optimize find nodes
+    //remove getnodecolor call, or optimize it
 }
 function findcolors()
 {
@@ -136,7 +138,7 @@ function setupcanvas()
   canvas.width = image.width;
   canvas.height = image.height;
 
-  context = canvas.getContext('2d', willReadFrequently = true);
+  context = canvas.getContext('2d', { willReadFrequently: true });
   context.drawImage(image, 0, 0);
   pixeldata = context.getImageData(0, 0, canvas.width, canvas.height);
 }
@@ -192,59 +194,49 @@ function findnodes()
   //print("findnodes");
   let pos;
   let color;
-  possiblenodes.length = 0;
   nodes.length = 0;
-  let x, y;
-  for(let i = 0 ; i < cellsvertical ; i++)//find all nodes
+  for(let y = 0 ; y < cellsvertical ; y++)//find all nodes
   {
-    for(let o = 0 ; o < cellshorizontal ; o++)
+    for(let x = 0 ; x < cellshorizontal ; x++)
     {
-      pos = nodeposition(o, i);
+      pos = nodeposition(x, y);
       color = getcolor(pos*4);
-      if(color == colorwall)//wall node
+      if(color == colorpath)
       {
-        possiblenodes.push({
-          position: pos,
-          posx: o,
-          posy: i,
-          ispath: false,
-          inlist: false
-        });
-      }
-      if(color == colorpath)//path node
-      {
-        possiblenodes.push({
-          position: pos,
-          posx: o,
-          posy: i,
-          ispath: true,
-          inlist: false
-        });
-      }
-    }
-  }
-  //print(possiblenodes.length);
-  
-  //find corners and forks
-  for(let i = 0 ; i < possiblenodes.length ; i++)
-  {
-    if(possiblenodes[i].ispath)
-    {
-      x = possiblenodes[i].posx;
-      y = possiblenodes[i].posy;
-      if(x == 0 || x == cellshorizontal-1 || y == 0 || y == cellsvertical-1)
-      {
-        possiblenodes[i].isexit = true;
-        nodes.push(possiblenodes[i]);
-      }
-      else if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
-      {
-        nodes.push(possiblenodes[i]);
+        if(x == 0 || x == cellshorizontal-1 || y == 0 || y == cellsvertical-1)
+        {
+          nodes.push({
+            position: pos,
+            posx: x,
+            posy: y,
+            inlist: false,
+            isexit: true
+          });
+        }
+        else if((getnodecolor(x-1, y) != getnodecolor(x+1, y)) || (getnodecolor(x, y-1) != getnodecolor(x, y+1)))
+        {
+          nodes.push({
+            position: pos,
+            posx: x,
+            posy: y,
+            inlist: false,
+            isexit: false
+          });
+        }
+        else if((getnodecolor(x-1, y) == getnodecolor(x+1, y)) && (getnodecolor(x-1, y) == getnodecolor(x, y+1)) && (getnodecolor(x-1, y) == getnodecolor(x, y-1)))
+        {
+          nodes.push({
+            position: pos,
+            posx: x,
+            posy: y,
+            inlist: false,
+            isexit: false
+          });
+        }
       }
     }
   }
   print("number of nodes: " + nodes.length);
-  //printnodes(nodes);
 }
 function nodeposition(x, y)
 {
@@ -255,13 +247,7 @@ function nodeposition(x, y)
 }
 function getnodecolor(x, y)
 {
-  for(let i = 0 ; i < possiblenodes.length ; i++)
-  {
-    if(possiblenodes[i].posx == x && possiblenodes[i].posy == y)
-    {
-      return getcolor(possiblenodes[i].position*4);
-    }
-  }
+  return getcolor(nodeposition(x, y)*4);
 }
 function printnodes(node)
 {
@@ -405,6 +391,7 @@ function astar()
       if(nodes[pathlist[0].id].isexit)break;
     addneighbour(pathlist[0].id);//add neighbour to list
     boublesort();//sort list
+    //drawnode(nodes[pathlist[0].id].posx, nodes[pathlist[0].id].posy)
     i++;
     //print(pathlist[0].distance);
     //if(i%1000 == 0)print(i);
@@ -530,7 +517,6 @@ function reset()
   paththickness = 0;
   cellsvertical = 0;
   cellshorizontal = 0;
-  possiblenodes = []; //list off all nodes, including walls
   nodes = []; // list of path corners and junctions
   exits = [];
   pathlist = [];
@@ -577,5 +563,3 @@ function drawgap(id1, id2)
 }
 //debug function
 //draw nodes in pathlist and buton to increment the main loop
-
-
