@@ -34,7 +34,8 @@ function solve()
   print("height " + image.height);
   print("number of pixels " + pixeldata.data.length);
   
-  pause = document.getElementById("timer").value;
+  if(drawanimation)
+    pause = document.getElementById("timer").value;
   
   findcolors();
   nodesize();
