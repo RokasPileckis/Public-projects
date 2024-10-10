@@ -12,8 +12,9 @@ let exits = [];
 let pathlist = [];
 let context;
 let path = [];
+let pause = 0;
+let drawanimation = false;
 
-//add solving animation
 
 function loadFile(event) 
 {
@@ -33,16 +34,15 @@ function solve()
   print("height " + image.height);
   print("number of pixels " + pixeldata.data.length);
   
+  pause = document.getElementById("timer").value;
+  
   findcolors();
   nodesize();
   findnodes();
   connectnodes();
   astar();
   if(pathlist.length == 0)return;//no path found
-  findpath();
   document.getElementById("output").style.display="none";
-  drawpath();
-  print("path length in cells: " + pathlist[0].distance);
 }
 function findcolors()
 {
@@ -351,7 +351,7 @@ function distanceaprox(i1, i2)
   y2 = nodes[i2].posy;
   return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
 }
-function astar()
+async function astar()
 {
   for(let i = 0 ; i < nodes.length ; i++)//find exits;
   {
@@ -368,7 +368,7 @@ function astar()
     });
       
   nodes[pathlist[0].id].inlist = true;   
-  nodes[pathlist[0].id].disstart = 0;
+  nodes[pathlist[0].id].disstart = 1;
   
   let i = 0;
   while(pathlist.length>0)
@@ -378,15 +378,25 @@ function astar()
     addneighbour(pathlist[0].id);
     boublesort();
     i++;
+    if(pause>0)await sleep(pause);
   }
   print("number of steps to solve: " + i);
+  
+  print("% of nodes visited: " + (i/nodes.length).toFixed(3));
   if(pathlist.length > 0)
+  {
     print("path found");
+    findpath();
+    drawpath();
+    print("path length in cells: " + nodes[pathlist[0].id].disstart);
+  }
   else print("failed");
 }
 function addneighbour(oldid)
 {
   let x, y, newid;
+  if(drawanimation)
+    drawnode(nodes[oldid].posx, nodes[oldid].posy, "green");
   for(let i = 1 ; i < 5 ; i++)//loop through neighbours
   {
     newid = nodes[oldid].neighbourid[i];
@@ -396,9 +406,13 @@ function addneighbour(oldid)
       y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
       nodes[newid].disstart = nodes[oldid].disstart + x + y;
       
+      if(drawanimation)
+        drawnode(nodes[newid].posx, nodes[newid].posy, "red");
+      
       pathlist.push({
         id: newid,
-        distance: nodes[newid].disstart + distanceaprox(newid, exits[1].id)
+        //distance: nodes[newid].disstart + distanceaprox(newid, exits[1].id)
+        distance: distanceaprox(newid, exits[1].id)//this is faster for 2 exits
       });
       nodes[newid].prenodeid = oldid;
       nodes[newid].inlist = true;
@@ -462,23 +476,24 @@ function printlist()
   }
   print("end of list");
 }
-function drawnode(px, py)
+function drawnode(px, py, color)
 {
   let x, y;
   x = nodeposition(px, py) % image.width;
   y = Math.floor(nodeposition(px, py) / image.width);
   
-  context.fillStyle = "red";
+  context.fillStyle = color;
   context.fillRect(x, y, paththickness, paththickness);
 }
 function drawpath()
 {
+  let color = "red";
   for(let i = 0 ; i < path.length ; i++)
   {
     let id = path[i];
-    drawnode(nodes[id].posx, nodes[id].posy);
+    drawnode(nodes[id].posx, nodes[id].posy, color);
     if(i < path.length-1)
-      drawgap(path[i], path[i+1]);
+      drawgap(path[i], path[i+1], color);
   }
 }
 function reset()
@@ -495,7 +510,7 @@ function reset()
   pathlist = [];
   path = [];
 }
-function drawgap(id1, id2)
+function drawgap(id1, id2, color)
 {
   let x1, x2, y1, y2, id, dx, dy;
   x1 = nodes[id1].posx;
@@ -509,28 +524,52 @@ function drawgap(id1, id2)
   {
     for(let i = x2+1 ; i < x1 ; i++)
     {
-      drawnode(i, y1);
+      drawnode(i, y1, color);
     }
   }
   if(dx<1)
   {
     for(let i = x1+1 ; i < x2 ; i++)
     {
-      drawnode(i, y1);
+      drawnode(i, y1, color);
     }
   }
   if(dy>1)
   {
     for(let i = y2+1 ; i < y1 ; i++)
     {
-      drawnode(x1, i);
+      drawnode(x1, i, color);
     }
   }
   if(dy<1)
   {
     for(let i = y1+1 ; i < y2 ; i++)
     {
-      drawnode(x1, i);
+      drawnode(x1, i, color);
     }
   }
 }
+function sleep(ms) 
+{
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+function drawsearch()
+{
+  drawanimation = document.getElementById("drawnodes").checked;
+  if(!drawanimation)
+  {
+    pause = 0;
+    document.getElementById("timer").style.display="none";
+    document.getElementById("timerlabel").style.display="none";
+  }
+  else
+  {
+    document.getElementById("timer").style.display="inline";
+    document.getElementById("timerlabel").style.display="inline";
+  }
+}
+
+
+
+
+
