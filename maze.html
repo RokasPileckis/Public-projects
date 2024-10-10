@@ -19,10 +19,13 @@
 </div>
 
 <p><input type="file"  accept="image/png" id="file"  onchange="loadFile(event)"></p>
-<p><button type="button" onclick="solve()">Find path</button></p>
+<button type="button" onclick="solve()">Find path</button>
+<input type="checkbox" id="drawnodes" onclick="drawsearch()">
+<label for="drawnodes">show search</label>
+<input type="number" id="timer" min="0" style="display:none">
+<label for="timer" id="timerlabel" style="display:none">animation timer (ms)</label>
+
 <p><img id="output"/></p>
 <canvas id="canvas"></canvas>
 
 </body>
-
-
