@@ -18,6 +18,9 @@ function loadFile(event)
 {
   image = document.getElementById('output');
   image.src = URL.createObjectURL(event.target.files[0]);
+  
+  document.getElementById("output").style.display="block";
+  document.getElementById("canvas").style.display="none";
 }
 function solve()
 {
@@ -30,19 +33,15 @@ function solve()
   print("number of pixels " + pixeldata.data.length);
   
   findcolors();
-  //findexitpixel();
   nodesize();
   findnodes();
-  //printnodes(nodes);
   connectnodes();
   astar();
-  if(pathlist.length == 0)return;
+  if(pathlist.length == 0)return;//no path found
   findpath();
+  document.getElementById("output").style.display="none";
   drawpath();
   print("path length in cells: " + pathlist[0].distance);
-  
-  //optimize find nodes
-    //remove getnodecolor call, or optimize it
 }
 function findcolors()
 {
@@ -135,6 +134,7 @@ function print(text)
 function setupcanvas()
 {
   let canvas = document.getElementById('canvas');
+  document.getElementById("canvas").style.display="block";
   canvas.width = image.width;
   canvas.height = image.height;
 
@@ -183,19 +183,16 @@ function nodesize()
   }
   cellsvertical = (height - wallthickness)/(wallthickness + paththickness)*2 + 1;
   cellshorizontal = (width - wallthickness)/(wallthickness + paththickness)*2 + 1;
-  
-  //print("paththickness " + paththickness);
-  //print("wallthickness " + wallthickness);
+ 
   print("number of cells horizontal " + cellshorizontal);
   print("number of cells vertical  " + cellsvertical);
 }
 function findnodes()
 {
-  //print("findnodes");
   let pos;
   let color;
   nodes.length = 0;
-  for(let y = 0 ; y < cellsvertical ; y++)//find all nodes
+  for(let y = 0 ; y < cellsvertical ; y++)
   {
     for(let x = 0 ; x < cellshorizontal ; x++)
     {
@@ -251,8 +248,6 @@ function getnodecolor(x, y)
 }
 function printnodes(node)
 {
-  //print("printnodes");
-  //print(node.length);
   let string;
   for(let i = 0 ; i < node.length ; i++)
   {
@@ -264,9 +259,6 @@ function printnodes(node)
 }
 function connectnodes()
 {
-  /*
-  if neighbour is path, add this node to neighbour
-  */
   let x, y, xmax, ymax;
   xmax = nodes[nodes.length-1].posx;
   ymax = nodes[nodes.length-1].posy;
@@ -347,11 +339,6 @@ function connectnodes()
         }
       }
     }
-    //print("id: " + i);
-    //print("nb1: " + nodes[i].neighbourid[1]);
-    //print("nb2: " + nodes[i].neighbourid[2]);
-    //print("nb3: " + nodes[i].neighbourid[3]);
-    //print("nb4: " + nodes[i].neighbourid[4]);
   }
 }
 function distanceaprox(i1, i2)
@@ -365,7 +352,6 @@ function distanceaprox(i1, i2)
 }
 function astar()
 {
-  print("a*");
   for(let i = 0 ; i < nodes.length ; i++)//find exits;
   {
     if(nodes[i].isexit)
@@ -382,26 +368,17 @@ function astar()
       
   nodes[pathlist[0].id].inlist = true;   
   nodes[pathlist[0].id].disstart = 0;
-  //printlist();
   
   let i = 0;
   while(pathlist.length>0)
   {
     if(i>0)
       if(nodes[pathlist[0].id].isexit)break;
-    addneighbour(pathlist[0].id);//add neighbour to list
-    boublesort();//sort list
-    //drawnode(nodes[pathlist[0].id].posx, nodes[pathlist[0].id].posy)
+    addneighbour(pathlist[0].id);
+    boublesort();
     i++;
-    //print(pathlist[0].distance);
-    //if(i%1000 == 0)print(i);
-    //if(i>5000)break;
-    //print(pathlist[0].id);
-    //print(pathlist.length);
-    //print(i);
-    //printlist();
   }
-  print(i);
+  print("number of steps to solve: " + i);
   if(pathlist.length > 0)
     print("path found");
   else print("failed");
@@ -414,16 +391,13 @@ function addneighbour(oldid)
     newid = nodes[oldid].neighbourid[i];
     if(newid != -1 && !nodes[newid].inlist)
     {
-      //print(newid);
       x = Math.abs(nodes[oldid].posx - nodes[newid].posx);
       y = Math.abs(nodes[oldid].posy - nodes[newid].posy);
       nodes[newid].disstart = nodes[oldid].disstart + x + y;
-      //print(nodes[oldid].disstart);
       
       pathlist.push({
         id: newid,
         distance: nodes[newid].disstart + distanceaprox(newid, exits[1].id)
-        
       });
       nodes[newid].prenodeid = oldid;
       nodes[newid].inlist = true;
@@ -474,7 +448,6 @@ function findpath()
     if(nodes[oldid].isexit)break;
     newid = nodes[oldid].prenodeid;
     oldid = newid;
-    
     path.push(oldid);
   }
   print("path length in nodes: " + path.length);
@@ -503,7 +476,6 @@ function drawpath()
   {
     let id = path[i];
     drawnode(nodes[id].posx, nodes[id].posy);
-    //draw in between nodes
     if(i < path.length-1)
       drawgap(path[i], path[i+1]);
   }
@@ -561,5 +533,3 @@ function drawgap(id1, id2)
     }
   }
 }
-//debug function
-//draw nodes in pathlist and buton to increment the main loop
