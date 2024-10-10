@@ -13,6 +13,7 @@ let pathlist = [];
 let context;
 let path = [];
 
+//add solving animation
 
 function loadFile(event) 
 {
