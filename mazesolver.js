@@ -148,43 +148,36 @@ function nodesize()
 {
   let width = image.width;
   let height = image.height;
-  wallthickness = width;
-  paththickness = width;
-  let countwall = 0;
-  let countpath = 0;
   let index;
   let color;
 
-  for(let i = 0 ; i < height ; i++)
+  let min;
+  if(width<=height)min = width;
+  else min = height;
+  let wall = false;
+  for(let i = 0 ; i < min ; i++)
   {
-    countwall = 0;
-    countpath = 0;
-    for(let o = 0 ; o < width ; o++)
+    index = i * width + i;
+    color = getcolor(index*4);
+    if(color == colorpath && !wall)
     {
-      index = i * height + o;
-      color = getcolor(index*4);
-      if(color == colorwall)
-      {
-        countwall++;
-        if(countpath > 0 && countpath < paththickness)
-        {
-          paththickness = countpath;
-        }
-        countpath = 0;
-      }
-      if(color == colorpath)
-      {
-        countpath++;
-        if(countwall > 0 && countwall < wallthickness)
-        {
-          wallthickness = countwall;
-        }
-        countwall = 0;
-      }
+      wallthickness = i;
+      wall = true;
+    }
+    if(color == colorwall && wall)
+    {
+      paththickness = i - wallthickness;
+      break;
     }
   }
+  
+  
+  
   cellsvertical = (height - wallthickness)/(wallthickness + paththickness)*2 + 1;
   cellshorizontal = (width - wallthickness)/(wallthickness + paththickness)*2 + 1;
+  
+  print("wallthickness: " + wallthickness);
+  print("paththickness: " + paththickness);
  
   print("number of cells horizontal " + cellshorizontal);
   print("number of cells vertical  " + cellsvertical);
@@ -569,8 +562,3 @@ function drawsearch()
     document.getElementById("timerlabel").style.display="inline";
   }
 }
-
-
-
-
-
